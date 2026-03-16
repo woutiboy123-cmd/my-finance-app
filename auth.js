@@ -25,12 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. CLICK FUNCTION
     if (authBtn) {
         authBtn.addEventListener('click', async (e) => {
-            e.preventDefault(); 
+            e.preventDefault();
 
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            
-            // FIX: Match this text exactly to what your toggleMode() function sets!
+
             const isRegister = authTitle.innerText === 'Create Account';
 
             if (!email || !password) {
@@ -48,10 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                     if (error) throw error;
-                    alert("Account created! You can now log in.");
-                    
-                    // Switch UI back to login mode automatically
-                    if (typeof toggleMode === "function") toggleMode(); 
+
+                    // Direct naar dashboard, geen popup
+                    window.location.href = 'dashboard.html';
 
                 } else {
                     // --- LOGIN ---
