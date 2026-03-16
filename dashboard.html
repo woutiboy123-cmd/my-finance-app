@@ -8,6 +8,22 @@
     <link href="https://fonts.googleapis.com" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://pxqbopifausvwlkvomgn.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_QEU1LxylnAea2td7Ond5Cg_XoBBrUWm';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Check if user is logged in
+    async function checkUser() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            // No user found? Kick them back to the login page
+            window.location.href = 'index.html';
+        }
+    }
+    checkUser();
+</script>
 </head>
 <body>
 

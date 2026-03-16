@@ -1,52 +1,46 @@
-// 1. CONFIGURATIE (Vul hier je eigen gegevens van Supabase in)
+// 1. CONFIGURATION
 const SUPABASE_URL = 'https://pxqbopifausvwlkvomgn.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_QEU1LxylnAea2td7Ond5Cg_XoBBrUWm';
 
 let supabaseClient;
 
-// Wacht tot de hele pagina (HTML + Scripts) is geladen
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Page loaded, initializing authentication...");
 
-    // 2. CONTROLEER BIBLIOTHEEK
+    // 2. CHECK LIBRARY
     if (window.supabase) {
-        // Maak de verbinding aan
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log("✅ Supabase is succesfully initialized.");
+        console.log("✅ Supabase is successfully initialized.");
     } else {
-        console.error("❌ FOUT: Supabase library is niet geladen. Zorg ervoor dat de script-tag correct is en dat er geen netwerkfouten zijn.");
+        console.error("❌ ERROR: Supabase library not loaded.");
         return;
     }
 
-    // 3. ELEMENTEN OPHALEN
+    // 3. GET ELEMENTS
     const authBtn = document.getElementById('auth-btn');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const authTitle = document.getElementById('auth-title');
 
-    // 4. DE KLIK-FUNCTIE
+    // 4. CLICK FUNCTION
     if (authBtn) {
         authBtn.addEventListener('click', async (e) => {
-            e.preventDefault(); // Voorkom dat de pagina ververst
+            e.preventDefault(); 
 
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            const isRegister = authTitle.innerText === 'Register';
+            
+            // FIX: Match this text exactly to what your toggleMode() function sets!
+            const isRegister = authTitle.innerText === 'Create Account';
 
-            // Basis check
             if (!email || !password) {
                 alert("Please fill in an email address and password.");
                 return;
             }
 
-            if (password.length < 6) {
-                alert("Password must be at least 6 characters long.");
-                return;
-            }
-
             try {
                 if (isRegister) {
-                    // --- REGISTREREN ---
+                    // --- REGISTER ---
                     console.log("Attempting to register:", email);
                     const { data, error } = await supabaseClient.auth.signUp({
                         email: email,
@@ -54,16 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                     if (error) throw error;
-
-                    // Als e-mailbevestiging UIT staat in Supabase, logt hij vaak direct in.
-                    // Als het AAN staat, krijgt de gebruiker deze melding:
-                    alert("Account created! Please check your email to confirm your account before logging in.");
+                    alert("Account created! You can now log in.");
                     
-                    // Zet de interface terug op inloggen
+                    // Switch UI back to login mode automatically
                     if (typeof toggleMode === "function") toggleMode(); 
 
                 } else {
-                    // --- INLOGGEN ---
+                    // --- LOGIN ---
                     console.log("Attempting to log in for:", email);
                     const { data, error } = await supabaseClient.auth.signInWithPassword({
                         email: email,
@@ -73,8 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (error) throw error;
 
                     if (data.user) {
-                        console.log("Logging in successful!", data.user);
-                        // Stuur de gebruiker naar het dashboard
+                        console.log("Login successful!", data.user);
                         window.location.href = 'dashboard.html';
                     }
                 }
@@ -83,7 +73,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Error: " + err.message);
             }
         });
-    } else {
-        console.error("❌ Error: Auth button not found. Check if the element with id 'auth-btn' exists in your HTML.");
     }
 });
