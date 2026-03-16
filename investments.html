@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investments - Personal Finance</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="investments.css">
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="investments.js"></script>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <h2 class="sidebar-title">Personal Finance</h2>
+            <nav>
+                <ul class="nav-list">
+                    <li><a href="../index.html" class="nav-item">Dashboard</a></li>
+                    <li><a href="../savings/savings.html" class="nav-item">Savings</a></li>
+                    <li><a href="investments.html" class="nav-item active">Investments</a></li>
+                    <li><a href="../transactions/transactions.html" class="nav-item">Transactions</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1 class="welcome-text">Investment Overview</h1>
+            </header>
+
+            <section class="stats-grid" style="display: grid; grid-template-columns: 1fr; margin-bottom: 25px;">
+                <div class="card" style="width: 100%; box-sizing: border-box;">
+                    <p class="card-label">Total Investment Balance</p>
+                    <h2 class="card-value" id="total-investment-amount" style="font-size: 2.5rem; margin-top: 10px;">€ 0,00</h2>
+                </div>
+            </section>
+
+            <section class="charts-grid">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Your Portfolios</h3>
+                        <button id="add-account-btn" class="add-btn-circle">+</button>
+                    </div>
+                    <div id="accounts-container" style="margin-top: 20px;"></div>
+                </div>
+
+                <div class="card">
+                    <p class="card-label">Yearly Invest Progress</p>
+                    <div class="chart-container">
+                        <canvas id="yearlyInvestmentChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="card modal-content">
+            <p class="card-label">New Invest Account</p>
+            <div class="modal-body">
+                <input type="text" id="new-account-name" placeholder="Portfolio Name (e.g. S&P 500)">
+                <div class="modal-buttons">
+                    <button id="cancel-modal" class="btn-secondary">Cancel</button>
+                    <button id="confirm-modal" class="btn-primary-small">Add Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-modal-overlay" class="modal-overlay">
+        <div class="card modal-content">
+            <p class="card-label" style="color: #f87171;">Delete Portfolio</p>
+            <div class="modal-body">
+                <p id="delete-modal-text" style="color: white; font-size: 15px;">Are you sure?</p>
+                <div class="modal-buttons">
+                    <button id="cancel-delete" class="btn-secondary">Cancel</button>
+                    <button id="confirm-delete" class="btn-delete-confirm">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
