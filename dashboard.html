@@ -3,103 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Finance Dashboard</title>
+    <title>Dashboard - Personal Finance</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+    <script src="script.js" defer></script>
     <style>
-        /* Deze CSS is specifiek voor de logout knop en raakt je sidebar niet aan */
-        .btn-logout-custom {
-            background-color: #811f1f; /* Dieper rood */
-            color: #eeeeee; /* Gebroken wit */
+        .btn-logout {
+            background-color: #811f1f;
+            color: #eeeeee;
             border: none;
             padding: 10px 22px;
             border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-family: inherit;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        .btn-logout-custom:hover {
-            background-color: #5a0d0d; /* Donkerder rood bij hover */
+        .btn-logout:hover {
+            background-color: #5a0d0d;
             transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .view-all-link {
+            color: #4facfe;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .view-all-link:hover {
+            text-decoration: underline;
         }
     </style>
-
     <script>
-    // Gebruik een unieke naam om conflicten met script.js te voorkomen
-    var myAppSupabase;
+        let supabaseClient;
 
-    async function initSupabase() {
-        const SB_URL = 'https://pxqbopifausvwlkvomgn.supabase.co';
-        const SB_KEY = 'sb_publishable_QEU1LxylnAea2td7Ond5Cg_XoBBrUWm';
-
-        // Wacht tot de Supabase bibliotheek beschikbaar is in het window object
-        if (window.supabase) {
-            myAppSupabase = window.supabase.createClient(SB_URL, SB_KEY);
-            console.log("Supabase client succesvol geinitialiseerd");
-            checkUser();
-        } else {
-            console.error("Supabase bibliotheek niet gevonden. Controleer de CDN link.");
-        }
-    }
-
-    async function checkUser() {
-        if (!myAppSupabase) return;
-        const { data: { user } } = await myAppSupabase.auth.getUser();
-        if (!user) {
-            window.location.replace('index.html');
-        }
-    }
-
-    // De uitlog functie die je knop aanroept
-    window.handleLogout = async function() {
-        console.log("Uitloggen poging...");
-        
-        if (!myAppSupabase) {
-            alert("Systeem nog aan het laden, probeer het over een seconde opnieuw.");
-            return;
+        async function initSupabase() {
+            if (!window.supabase) {
+                console.error('Supabase library not found.');
+                return;
+            }
+            supabaseClient = window.supabase.createClient(
+                'https://pxqbopifausvwlkvomgn.supabase.co',
+                'sb_publishable_QEU1LxylnAea2td7Ond5Cg_XoBBrUWm'
+            );
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) window.location.replace('index.html');
         }
 
-        try {
-            const { error } = await myAppSupabase.auth.signOut();
-            if (error) throw error;
-            window.location.replace('index.html');
-        } catch (err) {
-            console.error('Logout error:', err.message);
-            alert('Logout mislukt: ' + err.message);
-        }
-    };
+        window.handleLogout = async function () {
+            if (!supabaseClient) return;
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) throw error;
+                window.location.replace('index.html');
+            } catch (err) {
+                console.error('Logout error:', err.message);
+                alert('Logout failed: ' + err.message);
+            }
+        };
 
-    // Start de initialisatie zodra de pagina geladen is
-    window.addEventListener('DOMContentLoaded', initSupabase);
-</script>
+        window.addEventListener('DOMContentLoaded', initSupabase);
+    </script>
 </head>
 <body>
-
     <div class="dashboard-container">
         <aside class="sidebar">
             <h2 class="sidebar-title">Personal Finance</h2>
             <nav>
                 <ul class="nav-list">
-                    <li><a href="dashboard.html" class="nav-item active">Dashboard</a></li>
-                    <li><a href="savings.html" class="nav-item">Savings</a></li>
-                    <li><a href="investments.html" class="nav-item">Investments</a></li>
-                    <li><a href="transactions.html" class="nav-item">Transactions</a></li>
+                    <li><a href="dashboard.html"    class="nav-item active">Dashboard</a></li>
+                    <li><a href="savings.html"       class="nav-item">Savings</a></li>
+                    <li><a href="investments.html"   class="nav-item">Investments</a></li>
+                    <li><a href="transactions.html"  class="nav-item">Transactions</a></li>
                 </ul>
             </nav>
         </aside>
 
         <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; width: 100%;">
-                <h1 class="welcome-text" style="margin: 0;">Welcome back</h1>
-                <button onclick="handleLogout()" class="btn-logout-custom">Sign Out</button>
+            <header class="page-header">
+                <h1 class="welcome-text">Welcome back</h1>
+                <button onclick="handleLogout()" class="btn-logout">Sign Out</button>
             </header>
 
             <section class="stats-grid">
@@ -120,13 +109,13 @@
             <section class="charts-grid">
                 <div class="card">
                     <p class="card-label">Portfolio Spread</p>
-                    <div class="chart-container" style="height: 300px; position: relative;">
+                    <div class="chart-container">
                         <canvas id="portfolioSpreadChart"></canvas>
                     </div>
                 </div>
                 <div class="card">
                     <p class="card-label">Net Worth Growth</p>
-                    <div class="chart-container" style="height: 300px; position: relative;">
+                    <div class="chart-container">
                         <canvas id="netWorthChart"></canvas>
                     </div>
                 </div>
@@ -134,18 +123,13 @@
 
             <section class="transactions-area">
                 <div class="card">
-                    <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div class="card-header-flex">
                         <p class="card-label">Recent Transactions</p>
-                        <a href="transactions/transactions.html" style="color: #4facfe; text-decoration: none; font-size: 14px; font-weight: 600;">View All</a>
+                        <a href="transactions.html" class="view-all-link">View All</a>
                     </div>
-                    
-                    <div id="transactions-list">
-                        <p class="empty-state" style="color: #777; text-align: center; padding: 20px;">Geen recente transacties gevonden.</p>
-                    </div>
+                    <div id="transactions-list"></div>
                 </div>
             </section>
-
-            <script src="dashboard-recent.js"></script>
         </main>
     </div>
 </body>

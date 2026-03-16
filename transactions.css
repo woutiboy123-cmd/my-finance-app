@@ -1,210 +1,76 @@
-/* --- BASIS LAYOUT --- */
-.main-content {
-    flex: 1;
-    padding: 40px;
-    width: 100%;
-}
+/* ─── Layout ──────────────────────────────── */
 
 .full-width-container {
     width: 100%;
     margin-top: 20px;
 }
 
-.card {
-    width: 100%;
-    background-color: #1a1d23;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 30px;
+/* ─── Add Transaction Button ──────────────── */
+
+.btn-add-transaction {
+    background-color: transparent;
+    color: #4facfe;
+    border: 2px solid #4facfe;
+    padding: 10px 22px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.card-header-flex {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-/* --- DE GEUPDATE ADD TRANSACTION KNOP (Outline Stijl) --- */
-.btn-primary-small {
-    background-color: transparent !important;
-    color: #4facfe !important;
-    border: 2px solid #4facfe !important;
-    padding: 10px 22px !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-    font-size: 15px !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease-internal !important; /* Voor de vloeiende hover */
-    display: inline-block;
-}
-
-.btn-primary-small:hover {
-    background-color: #4facfe !important;
-    color: #0b0e14 !important; /* Tekst wordt donker zoals op je 2e foto */
+.btn-add-transaction:hover {
+    background-color: #4facfe;
+    color: #0b0e14;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
 }
 
-/* --- MODAL BOX --- */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(10px);
-    display: none; /* Wordt 'flex' via JS */
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-}
+/* ─── Transaction List ────────────────────── */
 
-.modal-content-box {
-    width: 90%;
-    max-width: 420px;
-    padding: 30px !important;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border);
-    padding: 14px;
-    border-radius: 12px;
-    color: white;
-    font-size: 16px;
-    outline: none;
-}
-
-.modal-body-vertical {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 25px;
-}
-
-/* --- DROP DOWN MENU (Category) --- */
-#trans-category {
-    background-color: transparent !important; /* Geen achtergrond, zoals Foto 1 */
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 12px !important;
-    padding: 12px 16px !important;
-    color: white !important;
-    cursor: pointer;
-    width: 100%;
-    
-    /* Grijze tekst centreren */
-    text-align: center !important;
-    text-align-last: center !important;
-    
-    /* Pijltje styling */
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 16px center !important;
-    background-size: 12px !important;
-    
-    transition: all 0.3s ease !important;
-}
-
-/* Hover effect voor dropdown */
-#trans-category:hover {
-    border-color: #4facfe !important;
-    box-shadow: 0 0 10px rgba(79, 172, 254, 0.1);
-}
-
-/* De lijst met opties zelf (kan niet volledig gestyled worden, maar dit helpt) */
-#trans-category option {
-    background-color: #1a1d23;
-    color: white;
-    text-align: center;
-}
-
-/* Subtiel effect als je erover hovert, pijltje blijft netjes grijs */
-#trans-category:hover {
-    border-color: rgba(255, 255, 255, 0.15) !important;
-}
-
-/* De opengeklapte lijst zelf donker maken */
-#trans-category option {
-    background-color: #1a1d23; /* Zelfde kleur als je kaarten */
-    color: white;
-    text-align: center;
-    padding: 10px;
-}
-
-.currency-wrapper-modal {
-    display: flex !important;
-    align-items: center !important;
-}
-
-.currency-wrapper-modal input {
-    background: transparent !important;
-    border: none !important;
-    color: white !important;
-    padding-left: 10px !important;
-    width: 100%;
-    font-size: 16px;
-    outline: none !important;
-}
-
-/* --- MODAL KNOPPEN (Exact zoals Investments Pop-up) --- */
-.modal-footer-btns {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 30px;
-}
-
-/* Basis stijl voor BEIDE knoppen (donker, doorzichtig) */
-#cancel-add-modal, #confirm-add-trans {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid var(--border) !important;
-    color: var(--text-muted) !important;
-    padding: 12px 20px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-/* Hover effect voor Cancel (Wordt wit/lichtgrijs) */
-#cancel-add-modal:hover {
-    color: #ffffff !important;
-    border-color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Hover effect voor Add (Wordt blauw) */
-#confirm-add-trans:hover {
-    background: #4facfe !important;
-    color: #0b0e14 !important;
-    border-color: #4facfe !important;
-}
-
-/* Update je account-item naar 4 kolommen */
 .account-item {
     padding: 25px 10px;
-    display: grid; 
-    grid-template-columns: 1fr 1fr 1.5fr auto; /* 4 kolommen nu! */
+    display: grid;
+    grid-template-columns: 1fr 150px 1fr;
     align-items: center;
-    gap: 15px; /* Wat ademruimte tussen de kolommen */
+    gap: 15px;
 }
 
 .category-display {
     color: #e0e0e6;
     font-weight: 700;
-    text-align: left;
-    font-size: 20px; /* Mooi groot zoals gevraagd */
+    font-size: 15px;
 }
 
 .date-display {
-    color: #777;
+    color: #888891;
     font-size: 14px;
     text-align: center;
+}
+
+.note-amount-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.note-display {
+    flex: 1;
+    text-align: center;
+    color: #888891;
+    font-size: 14px;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trans-right-side-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px;
 }
 
 .trans-right-side {
@@ -213,46 +79,153 @@
     font-size: 16px;
 }
 
-/* --- HET LIJNTJE (Volledige breedte onder de category) --- */
 .subtle-divider {
     height: 1px;
-    background: linear-gradient(to right, 
-        transparent, 
-        rgba(255, 255, 255, 0.18) 10%, 
-        rgba(255, 255, 255, 0.18) 90%, 
+    background: linear-gradient(to right,
+        transparent,
+        rgba(255, 255, 255, 0.18) 10%,
+        rgba(255, 255, 255, 0.18) 90%,
         transparent);
-    margin: 0 !important; /* Geforceerd op 0 voor de volle breedte */
     width: 100%;
 }
 
-.amount-positive { color: #4ade80 !important; }
-.amount-negative { color: #f87171 !important; }
+/* ─── Delete Button ───────────────────────── */
 
-/* Container voor bedrag + kruisje */
-.trans-right-side-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 15px;
-}
-
-/* Het Kruisje (✕) - Exact zoals op Investments/Savings */
 .delete-trans-btn {
-    background: transparent !important;
-    border: none !important;
-    color: var(--text-muted, #a0a0a0) !important; /* Standaard grijs */
-    cursor: pointer !important;
-    font-size: 18px !important;
+    background: transparent;
+    border: none;
+    color: var(--text-muted, #888891);
+    cursor: pointer;
+    font-size: 18px;
     opacity: 0.4;
-    transition: all 0.2s ease;
     padding: 5px 10px;
     line-height: 1;
+    transition: all 0.2s ease;
 }
 
 .delete-trans-btn:hover {
-    color: #f87171 !important; /* Wordt pas rood bij hover */
+    color: #f87171;
     opacity: 1;
     transform: scale(1.2);
+}
+
+/* ─── Modal ───────────────────────────────── */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.modal-content-box {
+    width: 90%;
+    max-width: 420px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    color: white;
+}
+
+.modal-alert {
+    max-width: 300px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.modal-body-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.modal-row {
+    display: flex;
+    gap: 12px;
+}
+
+/* ─── Modal Inputs ────────────────────────── */
+
+#trans-date,
+#trans-category,
+.currency-wrapper-modal,
+.modal-input-full {
+    background-color: #121212;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: white;
+    outline: none;
+    font-family: inherit;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+#trans-date,
+#trans-category {
+    flex: 1;
+    width: 100%;
+    cursor: pointer;
+}
+
+#trans-date { color-scheme: dark; }
+
+#trans-date:focus,
+#trans-category:focus,
+.modal-input-full:focus {
+    border-color: #4facfe;
+}
+
+/* ─── Category Dropdown ───────────────────── */
+
+#trans-category {
+    appearance: none;
+    -webkit-appearance: none;
+    text-align: center;
+    text-align-last: center;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 12px;
+}
+
+#trans-category option {
+    background-color: #1a1d23;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+/* ─── Amount Input ────────────────────────── */
+
+.currency-wrapper-modal {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.currency-wrapper-modal span {
+    color: var(--accent, #4facfe);
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.currency-wrapper-modal input {
+    background: transparent;
+    border: none;
+    color: white;
+    width: 100%;
+    font-size: 16px;
+    outline: none;
 }
 
 .currency-wrapper-modal input::-webkit-inner-spin-button,
@@ -261,126 +234,47 @@
     margin: 0;
 }
 
-/* --- NIEUWE MODAL LAYOUT --- */
-.modal-row {
-    display: flex;
-    gap: 12px;
-    width: 100%;
-}
+/* ─── Date Picker Icon ────────────────────── */
 
-/* De specifieke donkere achtergrond uit je screenshot */
-#trans-date, 
-#trans-category, 
-.currency-wrapper-modal {
-    background-color: #121212 !important; /* De donkere kleur uit je foto */
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 12px;
-    padding: 12px;
-    color: white;
-    outline: none;
-    flex: 1; /* Zorgt dat ze beide 50% breed zijn */
-}
-
-#trans-date {
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 12px;
-    padding: 12px 16px;
-    color: white;
-    width: 100%;
-    cursor: pointer; /* Handje als je eroverheen gaat */
-    font-family: inherit;
-    color-scheme: dark;
-    margin-bottom: 10px;
-}
-
-/* Specifieke styling voor de bedrag-wrapper */
-.currency-wrapper-modal span {
-    color: white !important; /* Was eerst blauw */
-    font-weight: 600;
-    margin-right: 8px;
-}
-
-.currency-wrapper-modal span {
-    color: var(--accent);
-    font-weight: bold;
-    margin-right: 8px;
-}
-
-.currency-wrapper-modal input {
-    background: transparent !important;
-    border: none !important;
-    color: white !important;
-    width: 100%;
-}
-
-/* Kalender icoontje wit maken */
-#trans-date::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    filter: invert(1);
-}
-
-#trans-date:hover::-webkit-calendar-picker-indicator {
-    opacity: 1;
-}
-
-/* Zorg dat het hele vakje van de datum klikbaar is voor de kalender */
-#trans-date {
-    position: relative;
-    cursor: pointer;
-}
-
-/* Het nieuwe notitieveld over de volle breedte */
-.modal-input-full {
-    background-color: #121212 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 12px;
-    padding: 12px 16px;
-    color: white;
-    width: 100%;
-    outline: none;
-    font-family: inherit;
-    margin-top: 5px;
-}
-
-.modal-input-full:focus {
-    border-color: #4facfe !important;
-}
-
-.account-item {
-    padding: 25px 10px;
-    display: grid; 
-    /* 1fr links, vaste 150px in het EXACTE midden, 1fr rechts */
-    grid-template-columns: 1fr 150px 1fr; 
-    align-items: center;
-    gap: 15px;
-}
-
-.note-amount-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    gap: 15px;
-}
-
-.note-display {
-    flex: 1; /* Pakt de vrije ruimte tussen datum en bedrag */
-    text-align: center; /* Plaatst tekst precies in het midden */
-    color: #888891;
-    font-size: 14px;
-    font-style: italic;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Plakt er '...' achter als het schermpje erg klein is */
-}
-
-/* Maak het kalender icoontje wit/lichtgrijs */
 input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+    filter: invert(100%) sepia(0%) saturate(0%) brightness(100%) contrast(100%);
     cursor: pointer;
     opacity: 0.6;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
+}
+
+/* ─── Modal Footer Buttons ────────────────── */
+
+.modal-footer-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+#cancel-add-modal,
+#confirm-add-trans {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #888891;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+#cancel-add-modal:hover {
+    color: #ffffff;
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#confirm-add-trans:hover {
+    background: #4facfe;
+    color: #0b0e14;
+    border-color: #4facfe;
 }

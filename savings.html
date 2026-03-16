@@ -3,83 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Finance Dashboard</title>
+    <title>Savings - Personal Finance</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="savings.css">
-    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="accounts.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="savings.js"></script>
+    <script src="savings.js" defer></script>
+    <style>
+        .total-balance {
+            font-size: 2.5rem;
+            margin-top: 10px;
+        }
+
+        .accounts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .accounts-header h3 {
+            margin: 0;
+        }
+
+        .account-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
-
     <div class="dashboard-container">
-        <!-- Sidebar -->
         <aside class="sidebar">
             <h2 class="sidebar-title">Personal Finance</h2>
             <nav>
                 <ul class="nav-list">
-                    <li><a href="dashboard.html" class="nav-item">Dashboard</a></li>
-                    <li><a href="savings.html" class="nav-item active">Savings</a></li>
-                    <li><a href="investments.html" class="nav-item">Investments</a></li>
+                    <li><a href="dashboard.html"   class="nav-item">Dashboard</a></li>
+                    <li><a href="savings.html"      class="nav-item active">Savings</a></li>
+                    <li><a href="investments.html"  class="nav-item">Investments</a></li>
                     <li><a href="transactions.html" class="nav-item">Transactions</a></li>
                 </ul>
             </nav>
         </aside>
 
-        <!-- Main Content -->
-    <main class="main-content">
-        <header>
-            <h1 class="welcome-text">Savings Overview</h1>
-        </header>
+        <main class="main-content">
+            <header>
+                <h1 class="welcome-text">Savings Overview</h1>
+            </header>
 
-        <section class="stats-grid" style="display: grid; grid-template-columns: 1fr; margin-bottom: 25px;">
-            <div class="card" style="width: 100%; box-sizing: border-box;">
-                <p class="card-label">Total Savings Balance</p>
-                <h2 class="card-value" id="total-savings-amount" style="font-size: 2.5rem; margin-top: 10px;">€ 0,00</h2>
-            </div>
-        </section>
-
-        <section class="charts-grid">
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="margin: 0;">Your Accounts</h3>
-                    <button id="add-account-btn" class="add-btn-circle">+</button>
+            <section class="stats-grid" style="grid-template-columns: 1fr;">
+                <div class="card">
+                    <p class="card-label">Total Savings Balance</p>
+                    <h2 class="card-value total-balance" id="total-savings-amount">€ 0,00</h2>
                 </div>
-            
-                <div id="accounts-container" style="margin-top: 20px;"></div>
-            </div>
+            </section>
 
-            <div class="card">
-                <p class="card-label">Yearly Savings Progress</p>
-                <div class="chart-container" style="height: 300px; position: relative;">
-                    <canvas id="yearlySavingsChart"></canvas>
+            <section class="charts-grid">
+                <div class="card">
+                    <div class="accounts-header">
+                        <h3>Your Accounts</h3>
+                        <button id="add-account-btn" class="add-btn-circle">+</button>
+                    </div>
+                    <div id="accounts-container"></div>
                 </div>
-            </div>
-        </section>
-    </main>
+
+                <div class="card">
+                    <p class="card-label">Yearly Savings Progress</p>
+                    <div class="chart-container">
+                        <canvas id="yearlySavingsChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Account Modal -->
     <div id="modal-overlay" class="modal-overlay">
-    <div class="card modal-content">
-        <p class="card-label">New Savings Account</p>
-        <div class="modal-body">
-            <input type="text" id="new-account-name" placeholder="Account Name (e.g. Emergency Fund)">
-            <div class="modal-buttons">
-                <button id="cancel-modal" class="btn-secondary">Cancel</button>
-                <button id="confirm-modal" class="btn-primary-small">Add Account</button>
+        <div class="card modal-content">
+            <p class="card-label">New Savings Account</p>
+            <div class="modal-body">
+                <input type="text" id="new-account-name" placeholder="Account Name (e.g. Emergency Fund)">
+                <div class="modal-buttons">
+                    <button id="cancel-modal"  class="btn-secondary">Cancel</button>
+                    <button id="confirm-modal" class="btn-primary-small">Add Account</button>
+                </div>
             </div>
         </div>
     </div>
-    </div>
+
+    <!-- Delete Account Modal -->
     <div id="delete-modal-overlay" class="modal-overlay">
-    <div class="card modal-content">
-        <p class="card-label" style="color: #f87171;">Delete Account</p>
-        <div class="modal-body">
-            <p id="delete-modal-text" style="color: white; font-size: 15px;">Are you sure you want to delete this account?</p>
-            <div class="modal-buttons">
-                <button id="cancel-delete" class="btn-secondary">Cancel</button>
-                <button id="confirm-delete" class="btn-delete-confirm">Delete</button>
+        <div class="card modal-content">
+            <p class="card-label" style="color: #f87171;">Delete Account</p>
+            <div class="modal-body">
+                <p id="delete-modal-text" style="color: white; font-size: 15px;">Are you sure you want to delete this account?</p>
+                <div class="modal-buttons">
+                    <button id="cancel-delete"  class="btn-secondary">Cancel</button>
+                    <button id="confirm-delete" class="btn-delete-confirm">Delete</button>
+                </div>
             </div>
         </div>
-    </div>
     </div>
 </body>
 </html>

@@ -6,6 +6,8 @@
     <title>Transactions - Personal Finance</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="transactions.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="transactions.js" defer></script>
 </head>
 <body>
     <div class="dashboard-container">
@@ -13,9 +15,9 @@
             <h2 class="sidebar-title">Personal Finance</h2>
             <nav>
                 <ul class="nav-list">
-                    <li><a href="dashboard.html" class="nav-item">Dashboard</a></li>
-                    <li><a href="savings.html" class="nav-item">Savings</a></li>
-                    <li><a href="investments.html" class="nav-item">Investments</a></li>
+                    <li><a href="dashboard.html"   class="nav-item">Dashboard</a></li>
+                    <li><a href="savings.html"      class="nav-item">Savings</a></li>
+                    <li><a href="investments.html"  class="nav-item">Investments</a></li>
                     <li><a href="transactions.html" class="nav-item active">Transactions</a></li>
                 </ul>
             </nav>
@@ -29,48 +31,47 @@
             <div class="full-width-container">
                 <div class="card">
                     <div class="card-header-flex">
-    <h3 class="card-label">History</h3>
-    <button id="main-add-btn" class="btn-primary-small">
-        Add Transaction +
-    </button>
-</div>
-                    
+                        <h3 class="card-label">History</h3>
+                        <button id="main-add-btn" class="btn-add-transaction">Add Transaction +</button>
+                    </div>
                     <div id="transactions-list"></div>
                 </div>
             </div>
         </main>
     </div>
 
+    <!-- Add Transaction Modal -->
     <div id="add-modal-overlay" class="modal-overlay">
-    <div class="modal-content-box">
-        <p class="card-label">New Transaction</p>
-        <div class="modal-body-vertical">
-    <input type="date" id="trans-date" onclick="this.showPicker()">
-    
-    <div class="modal-row">
-        <select id="trans-category">
-            <option value="" disabled selected>Category</option>
-            <option value="Food">Groceries</option>
-            <option value="Rent">Rent/ Mortgage</option>
-            <option value="Transport">Transportation</option>
-            <option value="Entertainment">Insurance</option>
-            <option value="Shopping">Dining Out</option>
-            <option value="Utilities">Utilities</option>
-            <option value="Hobbies">Hobbies</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Personal Care">Personal Care</option>
-            <option value="Medical Expenses">Medical Expenses</option>
-            <option value="Gifts">Gifts</option>
-            <option value="Other">Other</option>
-        </select>
+        <div class="modal-content-box">
+            <p class="card-label">New Transaction</p>
+            <div class="modal-body-vertical">
+                <input type="date" id="trans-date" onclick="this.showPicker()">
 
-        <div class="currency-wrapper-modal">
-            <span>€</span>
-            <input type="number" id="trans-amount" placeholder="0,00">
-        </div>
-    </div>
-    <input type="text" id="trans-note" placeholder="Note (optional)" class="modal-input-full" maxlength="100">
-    </div>
+                <div class="modal-row">
+                    <select id="trans-category">
+                        <option value="" disabled selected>Category</option>
+                        <option value="Food">Groceries</option>
+                        <option value="Rent">Rent / Mortgage</option>
+                        <option value="Transport">Transportation</option>
+                        <option value="Entertainment">Insurance</option>
+                        <option value="Shopping">Dining Out</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Hobbies">Hobbies</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Personal Care">Personal Care</option>
+                        <option value="Medical Expenses">Medical Expenses</option>
+                        <option value="Gifts">Gifts</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    <div class="currency-wrapper-modal">
+                        <span>€</span>
+                        <input type="number" id="trans-amount" placeholder="0,00">
+                    </div>
+                </div>
+
+                <input type="text" id="trans-note" class="modal-input-full" placeholder="Note (optional)" maxlength="100">
+            </div>
 
             <div class="modal-footer-btns">
                 <button id="cancel-add-modal">Cancel</button>
@@ -78,14 +79,13 @@
             </div>
         </div>
     </div>
-</div>
-<div id="custom-alert" class="modal-overlay" style="display: none; z-index: 2000;">
-    <div class="modal-content-box" style="text-align: center; max-width: 300px;">
-        <p style="color: white; margin-bottom: 20px; font-weight: 500;">Vul aub alle velden in.</p>
-        <button id="close-alert" class="btn-primary-small" style="width: 100%;">OK</button>
-    </div>
-</div>
 
-    <script src="transactions.js"></script>
+    <!-- Validation Alert -->
+    <div id="custom-alert" class="modal-overlay">
+        <div class="modal-content-box modal-alert">
+            <p>Please fill in all required fields.</p>
+            <button id="close-alert" class="btn-add-transaction">OK</button>
+        </div>
+    </div>
 </body>
 </html>

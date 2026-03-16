@@ -1,75 +1,46 @@
-// 1. CONFIGURATION
 const SUPABASE_URL = 'https://pxqbopifausvwlkvomgn.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_QEU1LxylnAea2td7Ond5Cg_XoBBrUWm';
 
 let supabaseClient;
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Page loaded, initializing authentication...");
-
-    // 2. CHECK LIBRARY
-    if (window.supabase) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log("✅ Supabase is successfully initialized.");
-    } else {
-        console.error("❌ ERROR: Supabase library not loaded.");
+    if (!window.supabase) {
+        console.error('Supabase library not loaded.');
         return;
     }
 
-    // 3. GET ELEMENTS
-    const authBtn = document.getElementById('auth-btn');
-    const emailInput = document.getElementById('email');
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const authBtn      = document.getElementById('auth-btn');
+    const emailInput   = document.getElementById('email');
     const passwordInput = document.getElementById('password');
-    const authTitle = document.getElementById('auth-title');
+    const authTitle    = document.getElementById('auth-title');
 
-    // 4. CLICK FUNCTION
-    if (authBtn) {
-        authBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
+    authBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
 
-            const email = emailInput.value.trim();
-            const password = passwordInput.value.trim();
+        const email    = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+        const isRegister = authTitle.innerText === 'Create Account';
 
-            const isRegister = authTitle.innerText === 'Create Account';
+        if (!email || !password) {
+            alert('Please fill in an email address and password.');
+            return;
+        }
 
-            if (!email || !password) {
-                alert("Please fill in an email address and password.");
-                return;
+        try {
+            if (isRegister) {
+                const { error } = await supabaseClient.auth.signUp({ email, password });
+                if (error) throw error;
+                window.location.href = 'dashboard.html';
+            } else {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                if (data.user) window.location.href = 'dashboard.html';
             }
-
-            try {
-                if (isRegister) {
-                    // --- REGISTER ---
-                    console.log("Attempting to register:", email);
-                    const { data, error } = await supabaseClient.auth.signUp({
-                        email: email,
-                        password: password
-                    });
-
-                    if (error) throw error;
-
-                    // Direct naar dashboard, geen popup
-                    window.location.href = 'dashboard.html';
-
-                } else {
-                    // --- LOGIN ---
-                    console.log("Attempting to log in for:", email);
-                    const { data, error } = await supabaseClient.auth.signInWithPassword({
-                        email: email,
-                        password: password
-                    });
-
-                    if (error) throw error;
-
-                    if (data.user) {
-                        console.log("Login successful!", data.user);
-                        window.location.href = 'dashboard.html';
-                    }
-                }
-            } catch (err) {
-                console.error("Auth Error:", err.message);
-                alert("Error: " + err.message);
-            }
-        });
-    }
+        } catch (err) {
+            console.error('Auth error:', err.message);
+            alert('Error: ' + err.message);
+        }
+    });
 });
