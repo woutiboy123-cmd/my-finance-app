@@ -1,21 +1,20 @@
 // 1. CONFIGURATIE (Vul hier je eigen gegevens van Supabase in)
-const SUPABASE_URL = 'https://jouw-project-id.supabase.co';
-const SUPABASE_KEY = 'jouw-anon-public-key';
+const SUPABASE_URL = 'https://pxqbopifausvwlkvomgn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_QEU1LxylnAea2td7Ond5Cg_XoBBrUWm';
 
 let supabaseClient;
 
 // Wacht tot de hele pagina (HTML + Scripts) is geladen
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Pagina geladen, verbinding maken met Supabase...");
+    console.log("Page loaded, initializing authentication...");
 
     // 2. CONTROLEER BIBLIOTHEEK
     if (window.supabase) {
         // Maak de verbinding aan
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log("✅ Supabase is succesvol verbonden!");
+        console.log("✅ Supabase is succesfully initialized.");
     } else {
-        console.error("❌ FOUT: Supabase bibliotheek niet gevonden. Check de script-link in je HTML!");
-        alert("Er is een technische fout bij het laden van de database.");
+        console.error("❌ FOUT: Supabase library is niet geladen. Zorg ervoor dat de script-tag correct is en dat er geen netwerkfouten zijn.");
         return;
     }
 
@@ -32,23 +31,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            const isRegister = authTitle.innerText === 'Registreren';
+            const isRegister = authTitle.innerText === 'Register';
 
             // Basis check
             if (!email || !password) {
-                alert("Vul aub een e-mailadres en wachtwoord in.");
+                alert("Please fill in an email address and password.");
                 return;
             }
 
             if (password.length < 6) {
-                alert("Wachtwoord moet minstens 6 tekens lang zijn.");
+                alert("Password must be at least 6 characters long.");
                 return;
             }
 
             try {
                 if (isRegister) {
                     // --- REGISTREREN ---
-                    console.log("Poging tot registreren voor:", email);
+                    console.log("Attempting to register:", email);
                     const { data, error } = await supabaseClient.auth.signUp({
                         email: email,
                         password: password
@@ -58,14 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Als e-mailbevestiging UIT staat in Supabase, logt hij vaak direct in.
                     // Als het AAN staat, krijgt de gebruiker deze melding:
-                    alert("Account aangemaakt! Je kunt nu proberen in te loggen (check evt. je mail).");
+                    alert("Account created! Please check your email to confirm your account before logging in.");
                     
                     // Zet de interface terug op inloggen
                     if (typeof toggleMode === "function") toggleMode(); 
 
                 } else {
                     // --- INLOGGEN ---
-                    console.log("Poging tot inloggen voor:", email);
+                    console.log("Attempting to log in for:", email);
                     const { data, error } = await supabaseClient.auth.signInWithPassword({
                         email: email,
                         password: password
@@ -74,17 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (error) throw error;
 
                     if (data.user) {
-                        console.log("Inloggen geslaagd!", data.user);
+                        console.log("Logging in successful!", data.user);
                         // Stuur de gebruiker naar het dashboard
                         window.location.href = 'dashboard.html';
                     }
                 }
             } catch (err) {
-                console.error("Auth Fout:", err.message);
-                alert("Fout: " + err.message);
+                console.error("Auth Error:", err.message);
+                alert("Error: " + err.message);
             }
         });
     } else {
-        console.error("❌ FOUT: Knop 'auth-btn' niet gevonden in de HTML.");
+        console.error("❌ Error: Auth button not found. Check if the element with id 'auth-btn' exists in your HTML.");
     }
 });
