@@ -1,49 +1,90 @@
-// 1. Instellingen (Vul je eigen gegevens in)
-const SUPABASE_URL = 'https://pxqbopifausvwlkvomgn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4cWJvcGlmYXVzdndsa3ZvbWduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2OTIwNjEsImV4cCI6MjA4OTI2ODA2MX0.H_iEEC685nkinFHcBuHwRPgPEt9-3ejKUFrAAWd__ik';
+// 1. CONFIGURATIE (Vul hier je eigen gegevens van Supabase in)
+const SUPABASE_URL = 'https://jouw-project-id.supabase.co';
+const SUPABASE_KEY = 'jouw-anon-public-key';
 
-// 2. Maak de client aan
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let supabaseClient;
 
-console.log("Supabase is geladen en klaar voor actie!");
-
-// 3. De knop functie
+// Wacht tot de hele pagina (HTML + Scripts) is geladen
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("Pagina geladen, verbinding maken met Supabase...");
+
+    // 2. CONTROLEER BIBLIOTHEEK
+    if (window.supabase) {
+        // Maak de verbinding aan
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log("✅ Supabase is succesvol verbonden!");
+    } else {
+        console.error("❌ FOUT: Supabase bibliotheek niet gevonden. Check de script-link in je HTML!");
+        alert("Er is een technische fout bij het laden van de database.");
+        return;
+    }
+
+    // 3. ELEMENTEN OPHALEN
     const authBtn = document.getElementById('auth-btn');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const authTitle = document.getElementById('auth-title');
 
+    // 4. DE KLIK-FUNCTIE
     if (authBtn) {
-        authBtn.addEventListener('click', async () => {
-            console.log("Er is geklikt!");
+        authBtn.addEventListener('click', async (e) => {
+            e.preventDefault(); // Voorkom dat de pagina ververst
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const title = document.getElementById('auth-title').innerText;
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            const isRegister = authTitle.innerText === 'Registreren';
+
+            // Basis check
+            if (!email || !password) {
+                alert("Vul aub een e-mailadres en wachtwoord in.");
+                return;
+            }
+
+            if (password.length < 6) {
+                alert("Wachtwoord moet minstens 6 tekens lang zijn.");
+                return;
+            }
 
             try {
-                if (title === 'Registreren') {
-                    console.log("Poging tot registreren...");
+                if (isRegister) {
+                    // --- REGISTREREN ---
+                    console.log("Poging tot registreren voor:", email);
                     const { data, error } = await supabaseClient.auth.signUp({
                         email: email,
                         password: password
                     });
+
                     if (error) throw error;
-                    alert("Account aangemaakt! Je kunt nu inloggen.");
+
+                    // Als e-mailbevestiging UIT staat in Supabase, logt hij vaak direct in.
+                    // Als het AAN staat, krijgt de gebruiker deze melding:
+                    alert("Account aangemaakt! Je kunt nu proberen in te loggen (check evt. je mail).");
+                    
+                    // Zet de interface terug op inloggen
+                    if (typeof toggleMode === "function") toggleMode(); 
+
                 } else {
-                    console.log("Poging tot inloggen...");
+                    // --- INLOGGEN ---
+                    console.log("Poging tot inloggen voor:", email);
                     const { data, error } = await supabaseClient.auth.signInWithPassword({
                         email: email,
                         password: password
                     });
+
                     if (error) throw error;
-                    console.log("Inloggen gelukt:", data);
-                    window.location.href = 'dashboard.html';
+
+                    if (data.user) {
+                        console.log("Inloggen geslaagd!", data.user);
+                        // Stuur de gebruiker naar het dashboard
+                        window.location.href = 'dashboard.html';
+                    }
                 }
             } catch (err) {
-                console.error("Foutmelding:", err.message);
-                alert("Er ging iets mis: " + err.message);
+                console.error("Auth Fout:", err.message);
+                alert("Fout: " + err.message);
             }
         });
     } else {
-        console.error("FOUT: De knop 'auth-btn' is niet gevonden in de HTML!");
+        console.error("❌ FOUT: Knop 'auth-btn' niet gevonden in de HTML.");
     }
 });
