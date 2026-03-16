@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inloggen - MyFinance</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .login-container {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .login-box {
+            background: #1c1c1e;
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 350px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label { display: block; margin-bottom: 8px; color: #8e8e93; font-size: 14px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #3a3a3c;
+            background: #2c2c2e;
+            color: white;
+            outline: none;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: #34c759;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h2 id="auth-title">Inloggen</h2>
+            <p id="auth-desc">Welkom terug!</p>
+            
+            <div class="input-group">
+                <label>E-mailadres</label>
+                <input type="email" id="email" placeholder="je@email.com">
+            </div>
+            
+            <div class="input-group">
+                <label>Wachtwoord</label>
+                <input type="password" id="password" placeholder="••••••••">
+            </div>
+            
+            <button class="btn-submit" id="auth-btn">Doorgaan</button>
+            <p style="font-size: 12px; cursor: pointer;" onclick="toggleMode()" id="toggle-text">Nog geen account? Registreer hier.</p>
+        </div>
+    </div>
+    <script src="auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Simpele functie om te wisselen tussen Login en Registratie tekst
+        function toggleMode() {
+            const title = document.getElementById('auth-title');
+            const btn = document.getElementById('auth-btn');
+            const toggle = document.getElementById('toggle-text');
+            
+            if (title.innerText === 'Inloggen') {
+                title.innerText = 'Registreren';
+                btn.innerText = 'Account aanmaken';
+                toggle.innerText = 'Al een account? Log hier in.';
+            } else {
+                title.innerText = 'Inloggen';
+                btn.innerText = 'Doorgaan';
+                toggle.innerText = 'Nog geen account? Registreer hier.';
+            }
+        }
+    </script>
+</body>
+</html>

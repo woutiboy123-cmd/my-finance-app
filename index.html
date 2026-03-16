@@ -3,81 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Finance Dashboard</title>
+    <title>Welkom bij MyFinance</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="script.js"></script>
+    <style>
+        .welcome-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .welcome-card {
+            background: #1c1c1e;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 100%;
+        }
+        .welcome-logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        .auth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn-auth {
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-login {
+            background-color: #34c759;
+            color: white;
+        }
+        .btn-register {
+            background-color: #2c2c2e;
+            color: white;
+            border: 1px solid #3a3a3c;
+        }
+        .btn-auth:hover {
+            transform: scale(1.02);
+        }
+        p { color: #8e8e93; margin-top: 20px; }
+    </style>
 </head>
 <body>
-
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <h2 class="sidebar-title">Personal Finance</h2>
-            <nav>
-                <ul class="nav-list">
-                    <li><a href="index.html" class="nav-item active">Dashboard</a></li>
-                    <li><a href="savings.html" class="nav-item">Savings</a></li>
-                    <li><a href="investments.html" class="nav-item">Investments</a></li>
-                    <li><a href="transactions.html" class="nav-item">Transactions</a></li>
-                </ul>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <header>
-                <h1 class="welcome-text">Welcome back</h1>
-            </header>
-
-            <!-- De 3 blokken bovenin -->
-            <section class="stats-grid">
-                <div class="card highlight-card">
-                    <p class="card-label">Total Balance</p>
-                    <h2 class="card-value" id="total-combined-balance">€ 0,00</h2>
-                </div>
-                <div class="card">
-                    <p class="card-label">Invested</p>
-                    <h2 class="card-value" id="dashboard-investment-amount">€ 0,00</h2>
-                </div>
-                <div class="card">
-                    <p class="card-label">Savings</p>
-                    <h2 class="card-value" id="dashboard-savings-amount">€ 0,00</h2>
-                </div>
-            </section>
-
-            <!-- Grafieken Sectie -->
-            <section class="charts-grid">
-                <div class="card">
-                    <p class="card-label">Portfolio Spread</p>
-                    <div class="chart-container" style="height: 300px; position: relative;">
-                        <canvas id="portfolioSpreadChart"></canvas>
-                    </div>
-                </div>
-                <div class="card">
-                    <p class="card-label">Net Worth Growth</p>
-                    <div class="chart-container" style="height: 300px; position: relative;">
-                        <canvas id="netWorthChart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <section class="transactions-area">
-    <div class="card">
-        <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <p class="card-label">Recent Transactions</p>
-            <a href="transactions/transactions.html" style="color: #4facfe; text-decoration: none; font-size: 14px; font-weight: 600;">View All</a>
+    <div class="welcome-container">
+        <div class="welcome-card">
+            <div class="welcome-logo">💰</div>
+            <h1>MyFinance</h1>
+            <p>Beheer je geld, bewaar je privacy. Log in om je persoonlijke profielen te bekijken.</p>
+            
+            <div class="auth-buttons">
+                <button class="btn-auth btn-login" onclick="location.href='login.html'">Inloggen</button>
+                <button class="btn-auth btn-register" onclick="location.href='login.html?mode=signup'">Account maken</button>
+            </div>
         </div>
-        
-        <div id="transactions-list">
-            <p class="empty-state" style="color: #777; text-align: center; padding: 20px;">Geen recente transacties gevonden.</p>
-        </div>
-    </div>
-</section>
-
-<script src="dashboard-recent.js"></script>
-        </main>
     </div>
 </body>
 </html>
