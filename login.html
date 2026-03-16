@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inloggen - MyFinance</title>
+    <title>Login - MyFinance</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .login-container {
@@ -50,21 +50,21 @@
 <body>
     <div class="login-container">
         <div class="login-box">
-            <h2 id="auth-title">Inloggen</h2>
-            <p id="auth-desc">Welkom terug!</p>
+            <h2 id="auth-title">Login</h2>
+            <p id="auth-desc">Welcome back!</p>
             
             <div class="input-group">
-                <label>E-mailadres</label>
-                <input type="email" id="email" placeholder="je@email.com">
+                <label>E-mail</label>
+                <input type="email" id="email" placeholder="your@email.com">
             </div>
             
             <div class="input-group">
-                <label>Wachtwoord</label>
+                <label>Password</label>
                 <input type="password" id="password" placeholder="••••••••">
             </div>
             
-            <button class="btn-submit" id="auth-btn">Doorgaan</button>
-            <p style="font-size: 12px; cursor: pointer;" onclick="toggleMode()" id="toggle-text">Nog geen account? Registreer hier.</p>
+            <button class="btn-submit" id="auth-btn">Login</button>
+            <p style="font-size: 12px; cursor: pointer;" onclick="toggleMode()" id="toggle-text">No account yet? Register here.</p>
         </div>
     </div>
     <script src="auth.js"></script>
