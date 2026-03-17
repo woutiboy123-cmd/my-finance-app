@@ -192,3 +192,19 @@ input::-webkit-inner-spin-button {
     color: white;
     border-color: #f87171;
 }
+
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .account-balance-input {
+        width: 90px;
+        font-size: 14px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+}

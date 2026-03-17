@@ -40,6 +40,8 @@ body {
 }
 
 .sidebar-title {
+    display: block;
+    text-decoration: none;
     font-size: 32px;
     font-weight: 700;
     color: #ffffff;
@@ -48,6 +50,12 @@ body {
     margin-bottom: 50px;
     padding-bottom: 12px;
     position: relative;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar-title:hover {
+    opacity: 0.8;
 }
 
 .sidebar-title::after {
@@ -107,7 +115,7 @@ body {
     font-size: 20px;
     color: var(--text-muted);
     font-weight: 400;
-    margin: 0;
+    margin: 0 0 45px 0;
 }
 
 /* ─── Cards ───────────────────────────────── */
@@ -213,4 +221,120 @@ body {
     color: var(--text-muted);
     font-style: italic;
     font-size: 14px;
+}
+
+/* ═══════════════════════════════════════════
+   MOBILE  —  desktop layout stays intact,
+   this only fixes usability on small screens
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+
+    body {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .dashboard-container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    /* Sidebar becomes a compact top bar */
+    .sidebar {
+        width: 100%;
+        padding: 20px 20px 10px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-title {
+        font-size: 20px;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+    }
+
+    .sidebar-title::after {
+        width: 100%;
+    }
+
+    .nav-list {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .nav-item {
+        padding: 8px 14px;
+        font-size: 13px;
+        margin-bottom: 0;
+    }
+
+    .nav-item:hover {
+        transform: none;
+    }
+
+    /* Main content */
+    .main-content {
+        padding: 24px 16px;
+    }
+
+    .welcome-text {
+        font-size: 18px;
+        margin-bottom: 24px;
+    }
+
+    /* Grids → single column */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    /* Cards */
+    .card {
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    .card:hover {
+        transform: none;
+    }
+
+    .card-value {
+        font-size: 22px;
+    }
+
+    /* Charts smaller on mobile */
+    .chart-container {
+        height: 200px;
+    }
+
+    /* Transaction list — hide date column to save space */
+    .account-item {
+        grid-template-columns: 1fr auto;
+        padding: 14px 6px;
+    }
+
+    .date-display {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 16px 12px;
+    }
+
+    .nav-item {
+        font-size: 12px;
+        padding: 7px 10px;
+    }
 }

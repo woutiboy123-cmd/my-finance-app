@@ -278,3 +278,28 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     color: #0b0e14;
     border-color: #4facfe;
 }
+
+@media (max-width: 768px) {
+    .account-item {
+        grid-template-columns: 1fr auto;
+        padding: 14px 6px;
+    }
+
+    .note-display {
+        display: none;
+    }
+
+    .modal-content-box {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .modal-row {
+        flex-direction: column;
+    }
+
+    .btn-add-transaction {
+        font-size: 13px;
+        padding: 8px 14px;
+    }
+}
