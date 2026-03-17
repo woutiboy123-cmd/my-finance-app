@@ -1,25 +1,13 @@
 /* Shared styles for Savings and Investments pages */
 
-/* ─── Total Balance Banner ────────────────── */
+/* ─── Highlight Card ──────────────────────── */
 
 .highlight-card {
     background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.1));
     border: 1px solid var(--accent);
 }
 
-.total-balance {
-    font-size: 2.5rem;
-    margin-top: 10px;
-}
-
 /* ─── Account List ────────────────────────── */
-
-.accounts-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
 
 .account-item {
     display: flex;
@@ -31,6 +19,13 @@
 
 .account-item span {
     font-weight: 500;
+    color: var(--text-main);
+}
+
+.account-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 /* ─── Balance Input ───────────────────────── */
@@ -96,6 +91,20 @@ input::-webkit-inner-spin-button {
     transform: scale(1.05);
 }
 
+/* ─── Accounts header ─────────────────────── */
+
+.accounts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.accounts-header h3 {
+    margin: 0;
+    color: var(--text-main);
+}
+
 /* ─── Delete Button ───────────────────────── */
 
 .delete-btn {
@@ -135,6 +144,9 @@ input::-webkit-inner-spin-button {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 24px;
 }
 
 .modal-body {
@@ -149,10 +161,13 @@ input::-webkit-inner-spin-button {
     border: 1px solid var(--border);
     padding: 14px;
     border-radius: 12px;
-    color: white;
+    color: var(--text-main);
     font-size: 16px;
     outline: none;
+    font-family: inherit;
 }
+
+.modal-body input::placeholder { color: var(--text-muted); }
 
 .modal-buttons {
     display: flex;
@@ -172,6 +187,7 @@ input::-webkit-inner-spin-button {
     border-radius: 12px;
     cursor: pointer;
     font-weight: 600;
+    font-family: inherit;
     transition: all 0.3s ease;
 }
 
@@ -193,18 +209,40 @@ input::-webkit-inner-spin-button {
     border-color: #f87171;
 }
 
+/* Total balance on savings/investments pages */
+.total-balance-value {
+    font-size: 2.5rem;
+    margin-top: 10px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* ─── Mobile ──────────────────────────────── */
+
 @media (max-width: 768px) {
+
+    .stats-grid[style] {
+        grid-template-columns: 1fr !important;
+    }
+
     .charts-grid {
         grid-template-columns: 1fr;
     }
 
     .account-balance-input {
-        width: 90px;
+        width: 80px;
         font-size: 14px;
     }
 
     .modal-content {
         width: 95%;
         padding: 20px;
+    }
+
+    .btn-secondary,
+    .btn-primary-small,
+    .btn-delete-confirm {
+        padding: 10px 14px;
+        font-size: 13px;
     }
 }

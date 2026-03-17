@@ -1,42 +1,39 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const container    = document.getElementById('accounts-container');
-    const totalDisplay = document.getElementById('total-savings-amount');
-    const addBtn       = document.getElementById('add-account-btn');
-    const modalInput   = document.getElementById('new-account-name');
-    const modalOverlay = document.getElementById('modal-overlay');
-    const deleteModal  = document.getElementById('delete-modal-overlay');
+document.addEventListener('DOMContentLoaded', function() {
+    var container    = document.getElementById('accounts-container');
+    var totalDisplay = document.getElementById('total-savings-amount');
+    var addBtn       = document.getElementById('add-account-btn');
+    var modalInput   = document.getElementById('new-account-name');
+    var modalOverlay = document.getElementById('modal-overlay');
+    var deleteModal  = document.getElementById('delete-modal-overlay');
 
-    let accounts = JSON.parse(localStorage.getItem('savingsAccounts')) || [];
-
-    // ─── Render ────────────────────────────────
+    var accounts = JSON.parse(localStorage.getItem('savingsAccounts')) || [];
 
     function updateUI() {
         container.innerHTML = '';
-        let total = 0;
+        var total = 0;
 
-        accounts.forEach((acc, index) => {
-            const balance          = parseFloat(acc.balance) || 0;
-            const formattedBalance = balance.toLocaleString('nl-NL', { minimumFractionDigits: 2 });
+        accounts.forEach(function(acc, index) {
+            var balance          = parseFloat(acc.balance) || 0;
+            var formattedBalance = balance.toLocaleString('nl-NL', { minimumFractionDigits: 2 });
             total += balance;
 
-            const div = document.createElement('div');
+            var div = document.createElement('div');
             div.className = 'account-item';
-            div.innerHTML = `
-                <span>${acc.name}</span>
-                <div class="account-item-controls">
-                    <div class="currency-wrapper">
-                        <span>€</span>
-                        <input type="text" class="account-balance-input" value="${formattedBalance}"
-                            onfocus="if(this.value === '0' || this.value === '0,00') this.value = '';"
-                            onblur="window.updateSavingsBalance(${index}, this.value)">
-                    </div>
-                    <button onclick="window.openDeleteModal(${index})" class="delete-btn">✕</button>
-                </div>
-            `;
+            div.innerHTML =
+                '<span>' + acc.name + '</span>' +
+                '<div class="account-item-controls">' +
+                    '<div class="currency-wrapper">' +
+                        '<span>\u20ac</span>' +
+                        '<input type="text" class="account-balance-input" value="' + formattedBalance + '"' +
+                            ' onfocus="if(this.value===\'0\'||this.value===\'0,00\')this.value=\'\';"' +
+                            ' onblur="window.updateSavingsBalance(' + index + ',this.value)">' +
+                    '</div>' +
+                    '<button onclick="window.openDeleteModal(' + index + ')" class="delete-btn">\u2715</button>' +
+                '</div>';
             container.appendChild(div);
         });
 
-        totalDisplay.innerText = `€ ${total.toLocaleString('nl-NL', { minimumFractionDigits: 2 })}`;
+        totalDisplay.innerText = '\u20ac ' + total.toLocaleString('nl-NL', { minimumFractionDigits: 2 });
         localStorage.setItem('savingsAccounts', JSON.stringify(accounts));
 
         if (window.savingsChart) {
@@ -47,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ─── Chart ─────────────────────────────────
 
-    const chartElem = document.getElementById('yearlySavingsChart');
+    var chartElem = document.getElementById('yearlySavingsChart');
     if (chartElem) {
         window.savingsChart = new Chart(chartElem.getContext('2d'), {
             type: 'line',
@@ -57,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     label: 'Savings',
                     data: new Array(12).fill(0),
                     borderColor: '#4facfe',
-                    backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                    backgroundColor: 'rgba(79,172,254,0.1)',
                     fill: true,
                     tension: 0.4,
                     borderWidth: 3
@@ -66,49 +63,49 @@ document.addEventListener('DOMContentLoaded', () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
+                    x: { grid: { display: false },                  ticks: { color: '#888' } }
+                }
             }
         });
     }
 
     // ─── Events ────────────────────────────────
 
-    addBtn.onclick = () => {
+    addBtn.onclick = function() {
         modalOverlay.style.display = 'flex';
         modalInput.focus();
     };
 
-    document.getElementById('confirm-modal').onclick = () => {
-        const name = modalInput.value.trim();
+    document.getElementById('confirm-modal').onclick = function() {
+        var name = modalInput.value.trim();
         if (!name) return;
-        accounts.push({ name, balance: 0 });
+        accounts.push({ name: name, balance: 0 });
         updateUI();
         modalOverlay.style.display = 'none';
         modalInput.value = '';
     };
 
-    document.getElementById('confirm-delete').onclick = () => {
+    document.getElementById('confirm-delete').onclick = function() {
         if (window.indexToDelete === undefined) return;
         accounts.splice(window.indexToDelete, 1);
         updateUI();
         deleteModal.style.display = 'none';
     };
 
-    document.querySelectorAll('#cancel-modal, #cancel-delete').forEach(btn => {
-        btn.onclick = () => {
-            modalOverlay.style.display = 'none';
-            deleteModal.style.display  = 'none';
-        };
-    });
+    document.getElementById('cancel-modal').onclick = function() { modalOverlay.style.display = 'none'; };
+    document.getElementById('cancel-delete').onclick = function() { deleteModal.style.display  = 'none'; };
 
-    // ─── Global Functions ──────────────────────
+    // ─── Global ────────────────────────────────
 
-    window.updateSavingsBalance = (index, val) => {
+    window.updateSavingsBalance = function(index, val) {
         accounts[index].balance = parseFloat(val.replace(',', '.')) || 0;
         updateUI();
     };
 
-    window.openDeleteModal = (index) => {
+    window.openDeleteModal = function(index) {
         window.indexToDelete = index;
         deleteModal.style.display = 'flex';
     };

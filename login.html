@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In - Personal Finance</title>
+    <title>Access - MyFinance</title>
     <style>
         :root {
-            --bg-color:     #000000;
-            --card-bg:      #1c1c1e;
+            --bg-color: #000000;
+            --card-bg: #1c1c1e;
             --accent-green: #34c759;
-            --text-main:    #ffffff;
-            --text-dim:     #8e8e93;
-            --input-bg:     #2c2c2e;
+            --text-main: #ffffff;
+            --text-dim: #8e8e93;
+            --input-bg: #2c2c2e;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             display: flex;
@@ -33,48 +32,29 @@
             width: 100%;
             max-width: 360px;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        h2 {
-            margin-bottom: 8px;
-            font-size: 28px;
-        }
+        h2 { margin-bottom: 8px; font-size: 28px; }
+        p.subtitle { color: var(--text-dim); margin-bottom: 32px; font-size: 15px; }
 
-        .subtitle {
-            color: var(--text-dim);
-            margin-bottom: 32px;
-            font-size: 15px;
-        }
-
-        .input-group {
-            text-align: left;
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-dim);
-            font-size: 13px;
-            font-weight: 500;
-        }
-
+        .input-group { text-align: left; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: var(--text-dim); font-size: 13px; font-weight: 500; }
+        
         input {
             width: 100%;
             padding: 14px;
+            box-sizing: border-box;
             border-radius: 12px;
             border: 1px solid #3a3a3c;
             background: var(--input-bg);
             color: white;
             font-size: 16px;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border 0.2s;
         }
 
-        input:focus {
-            border-color: var(--accent-green);
-        }
+        input:focus { border-color: var(--accent-green); }
 
         .btn-submit {
             width: 100%;
@@ -90,10 +70,9 @@
             transition: opacity 0.2s;
         }
 
-        .btn-submit:hover {
-            opacity: 0.9;
-        }
+        .btn-submit:hover { opacity: 0.9; }
 
+        /* The blue clickable text you asked for */
         .toggle-container {
             margin-top: 24px;
             font-size: 14px;
@@ -101,34 +80,34 @@
         }
 
         .toggle-link {
-            color: #007aff;
+            color: #007aff; /* iOS Blue */
             font-weight: 600;
             cursor: pointer;
+            text-decoration: none;
             margin-left: 5px;
         }
 
-        .toggle-link:hover {
-            text-decoration: underline;
-        }
+        .toggle-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
+
     <div class="login-box">
         <h2 id="auth-title">Sign In</h2>
-        <p class="subtitle" id="auth-desc">Enter your details to access your account.</p>
-
+        <p class="subtitle" id="auth-desc">Enter your details to access your profiles.</p>
+        
         <div class="input-group">
-            <label for="email">Email Address</label>
+            <label>Email Address</label>
             <input type="email" id="email" placeholder="name@example.com">
         </div>
-
+        
         <div class="input-group">
-            <label for="password">Password</label>
+            <label>Password</label>
             <input type="password" id="password" placeholder="••••••••">
         </div>
-
+        
         <button class="btn-submit" id="auth-btn">Continue</button>
-
+        
         <div class="toggle-container">
             <span id="toggle-text-prefix">Don't have an account?</span>
             <span class="toggle-link" id="toggle-link" onclick="toggleMode()">Create one</span>
@@ -139,26 +118,34 @@
     <script src="auth.js" defer></script>
     <script>
         function toggleMode() {
-            const title  = document.getElementById('auth-title');
-            const desc   = document.getElementById('auth-desc');
-            const btn    = document.getElementById('auth-btn');
+            const title = document.getElementById('auth-title');
+            const desc = document.getElementById('auth-desc');
+            const btn = document.getElementById('auth-btn');
             const prefix = document.getElementById('toggle-text-prefix');
-            const link   = document.getElementById('toggle-link');
-
-            const isLogin = title.innerText === 'Sign In';
-
-            title.innerText  = isLogin ? 'Create Account'                          : 'Sign In';
-            desc.innerText   = isLogin ? 'Join to start tracking.'                 : 'Enter your details to access your account.';
-            btn.innerText    = isLogin ? 'Sign Up'                                 : 'Continue';
-            prefix.innerText = isLogin ? 'Already have an account?'                : "Don't have an account?";
-            link.innerText   = isLogin ? 'Sign In'                                 : 'Create one';
+            const link = document.getElementById('toggle-link');
+            
+            if (title.innerText === 'Sign In') {
+                title.innerText = 'Create Account';
+                desc.innerText = 'Join to start tracking.';
+                btn.innerText = 'Sign Up';
+                prefix.innerText = 'Already have an account?';
+                link.innerText = 'Sign In';
+            } else {
+                title.innerText = 'Sign In';
+                desc.innerText = 'Enter your details to access your profiles.';
+                btn.innerText = 'Continue';
+                prefix.innerText = "Don't have an account?";
+                link.innerText = 'Create one';
+            }
         }
 
+        // Logic to check if user clicked "Create Account" from the welcome page
         window.onload = () => {
-            if (new URLSearchParams(window.location.search).get('mode') === 'signup') {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('mode') === 'signup') {
                 toggleMode();
             }
-        };
+        }
     </script>
 </body>
 </html>

@@ -46,7 +46,6 @@
             <p class="card-label">New Transaction</p>
             <div class="modal-body-vertical">
                 <input type="date" id="trans-date" onclick="this.showPicker()">
-
                 <div class="modal-row">
                     <select id="trans-category">
                         <option value="" disabled selected>Category</option>
@@ -63,16 +62,13 @@
                         <option value="Gifts">Gifts</option>
                         <option value="Other">Other</option>
                     </select>
-
                     <div class="currency-wrapper-modal">
                         <span>€</span>
                         <input type="number" id="trans-amount" placeholder="0,00">
                     </div>
                 </div>
-
                 <input type="text" id="trans-note" class="modal-input-full" placeholder="Note (optional)" maxlength="100">
             </div>
-
             <div class="modal-footer-btns">
                 <button id="cancel-add-modal">Cancel</button>
                 <button id="confirm-add-trans">Add Transaction</button>
@@ -83,8 +79,8 @@
     <!-- Validation Alert -->
     <div id="custom-alert" class="modal-overlay">
         <div class="modal-content-box modal-alert">
-            <p>Please fill in all required fields.</p>
-            <button id="close-alert" class="btn-add-transaction">OK</button>
+            <p style="color: var(--text-main, #e0e0e6); font-weight: 500;">Please fill in all required fields.</p>
+            <button id="close-alert">OK</button>
         </div>
     </div>
 </body>

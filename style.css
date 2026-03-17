@@ -5,13 +5,13 @@
 }
 
 :root {
-    --bg-color: #0b0e14;
-    --sidebar-bg: rgba(255, 255, 255, 0.02);
-    --card-bg: rgba(255, 255, 255, 0.04);
-    --text-main: #e0e0e6;
-    --text-muted: #888891;
-    --accent: #4facfe;
-    --border: rgba(255, 255, 255, 0.08);
+    --bg-color:     #0b0e14;
+    --sidebar-bg:   rgba(255, 255, 255, 0.02);
+    --card-bg:      rgba(255, 255, 255, 0.04);
+    --text-main:    #e0e0e6;
+    --text-muted:   #888891;
+    --accent:       #4facfe;
+    --border:       rgba(255, 255, 255, 0.08);
 }
 
 body {
@@ -39,6 +39,7 @@ body {
     flex-shrink: 0;
 }
 
+/* sidebar-title is an <a> tag → reset link styles */
 .sidebar-title {
     display: block;
     text-decoration: none;
@@ -50,7 +51,6 @@ body {
     margin-bottom: 50px;
     padding-bottom: 12px;
     position: relative;
-    cursor: pointer;
     transition: opacity 0.2s ease;
 }
 
@@ -69,9 +69,7 @@ body {
     border-radius: 4px;
 }
 
-.nav-list {
-    list-style: none;
-}
+.nav-list { list-style: none; }
 
 .nav-item {
     display: block;
@@ -127,7 +125,7 @@ body {
     margin-bottom: 40px;
 }
 
-.stats-grid { grid-template-columns: repeat(3, 1fr); }
+.stats-grid  { grid-template-columns: repeat(3, 1fr); }
 .charts-grid { grid-template-columns: 1fr 1fr; }
 
 .card {
@@ -155,6 +153,7 @@ body {
     margin-top: 12px;
     font-size: 28px;
     font-weight: 600;
+    color: var(--text-main);
 }
 
 .card-header-flex {
@@ -172,11 +171,9 @@ body {
     margin-top: 20px;
 }
 
-/* ─── Transaction List ────────────────────── */
+/* ─── Transaction List (dashboard) ────────── */
 
-#transactions-list {
-    margin-top: 20px;
-}
+#transactions-list { margin-top: 20px; }
 
 .account-item {
     padding: 20px 10px;
@@ -224,8 +221,8 @@ body {
 }
 
 /* ═══════════════════════════════════════════
-   MOBILE  —  desktop layout stays intact,
-   this only fixes usability on small screens
+   MOBILE  (≤ 768px)
+   Desktop is completely unchanged.
    ═══════════════════════════════════════════ */
 
 @media (max-width: 768px) {
@@ -240,101 +237,88 @@ body {
         height: auto;
     }
 
-    /* Sidebar becomes a compact top bar */
+    /* Sidebar becomes compact top bar */
     .sidebar {
         width: 100%;
-        padding: 20px 20px 10px;
+        padding: 16px 16px 10px;
         border-right: none;
         border-bottom: 1px solid var(--border);
     }
 
     .sidebar-title {
-        font-size: 20px;
-        margin-bottom: 16px;
+        font-size: 18px;
+        margin-bottom: 12px;
         padding-bottom: 8px;
     }
 
-    .sidebar-title::after {
-        width: 100%;
-    }
+    .sidebar-title::after { width: 100%; }
 
     .nav-list {
         display: flex;
         flex-direction: row;
-        gap: 4px;
         flex-wrap: wrap;
+        gap: 4px;
     }
 
     .nav-item {
-        padding: 8px 14px;
+        padding: 8px 12px;
         font-size: 13px;
         margin-bottom: 0;
     }
 
-    .nav-item:hover {
-        transform: none;
-    }
+    .nav-item:hover { transform: none; }
 
     /* Main content */
-    .main-content {
-        padding: 24px 16px;
-    }
+    .main-content { padding: 20px 16px; }
 
     .welcome-text {
         font-size: 18px;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
+    }
+
+    /* page-header: stack sign-out below title on very small screens */
+    .page-header {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 16px;
     }
 
     /* Grids → single column */
     .stats-grid {
         grid-template-columns: 1fr;
-        gap: 14px;
-        margin-bottom: 20px;
+        gap: 12px;
+        margin-bottom: 16px;
     }
 
     .charts-grid {
         grid-template-columns: 1fr;
-        gap: 14px;
-        margin-bottom: 20px;
+        gap: 12px;
+        margin-bottom: 16px;
     }
 
     /* Cards */
     .card {
-        padding: 20px;
-        border-radius: 18px;
+        padding: 18px;
+        border-radius: 16px;
     }
 
-    .card:hover {
-        transform: none;
-    }
+    .card:hover { transform: none; }
 
-    .card-value {
-        font-size: 22px;
-    }
+    .card-value { font-size: 22px; }
 
-    /* Charts smaller on mobile */
-    .chart-container {
-        height: 200px;
-    }
+    /* Charts */
+    .chart-container { height: 200px; }
 
-    /* Transaction list — hide date column to save space */
+    /* Dashboard transaction list */
     .account-item {
         grid-template-columns: 1fr auto;
-        padding: 14px 6px;
+        padding: 12px 4px;
     }
 
-    .date-display {
-        display: none;
-    }
+    .date-display { display: none; }
 }
 
-@media (max-width: 480px) {
-    .main-content {
-        padding: 16px 12px;
-    }
-
-    .nav-item {
-        font-size: 12px;
-        padding: 7px 10px;
-    }
+@media (max-width: 420px) {
+    .main-content { padding: 16px 12px; }
+    .nav-item { font-size: 12px; padding: 6px 10px; }
 }

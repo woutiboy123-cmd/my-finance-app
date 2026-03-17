@@ -20,34 +20,28 @@
             cursor: pointer;
             font-family: inherit;
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            white-space: nowrap;
         }
-
         .btn-logout:hover {
             background-color: #7a2828;
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
-
         .view-all-link {
             color: #4facfe;
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
         }
+        .view-all-link:hover { text-decoration: underline; }
 
-        .view-all-link:hover {
-            text-decoration: underline;
-        }
     </style>
     <script>
         let supabaseClient;
 
         async function initSupabase() {
-            if (!window.supabase) {
-                console.error('Supabase library not found.');
-                return;
-            }
+            if (!window.supabase) { console.error('Supabase not found.'); return; }
             supabaseClient = window.supabase.createClient(
                 'https://pxqbopifausvwlkvomgn.supabase.co',
                 'sb_publishable_QEU1LxylnAea2td7Ond5Cg_XoBBrUWm'
@@ -63,7 +57,6 @@
                 if (error) throw error;
                 window.location.replace('index.html');
             } catch (err) {
-                console.error('Logout error:', err.message);
                 alert('Logout failed: ' + err.message);
             }
         };
@@ -77,22 +70,22 @@
             <a href="dashboard.html" class="sidebar-title">Personal Finance</a>
             <nav>
                 <ul class="nav-list">
-                    <li><a href="dashboard.html"    class="nav-item active">Dashboard</a></li>
-                    <li><a href="savings.html"       class="nav-item">Savings</a></li>
-                    <li><a href="investments.html"   class="nav-item">Investments</a></li>
-                    <li><a href="transactions.html"  class="nav-item">Transactions</a></li>
+                    <li><a href="dashboard.html"   class="nav-item active">Dashboard</a></li>
+                    <li><a href="savings.html"      class="nav-item">Savings</a></li>
+                    <li><a href="investments.html"  class="nav-item">Investments</a></li>
+                    <li><a href="transactions.html" class="nav-item">Transactions</a></li>
                 </ul>
             </nav>
         </aside>
 
         <main class="main-content">
             <header class="page-header">
-                <h1 class="welcome-text">Welcome back</h1>
+                <h1 class="welcome-text" style="margin-bottom: 0;">Welcome back</h1>
                 <button onclick="handleLogout()" class="btn-logout">Sign Out</button>
             </header>
 
-            <section class="stats-grid">
-                <div class="card highlight-card">
+            <section class="stats-grid" style="margin-top: 30px;">
+                <div class="card">
                     <p class="card-label">Total Balance</p>
                     <h2 class="card-value" id="total-combined-balance">€ 0,00</h2>
                 </div>
@@ -109,7 +102,7 @@
             <section class="charts-grid">
                 <div class="card">
                     <p class="card-label">Portfolio Spread</p>
-                    <div class="chart-container">
+                    <div class="chart-container" style="height: 280px;">
                         <canvas id="portfolioSpreadChart"></canvas>
                     </div>
                 </div>
