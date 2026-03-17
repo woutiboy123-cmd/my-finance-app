@@ -366,12 +366,20 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
     .modal-row-top {
         flex-direction: column;
         gap: 10px;
+        width: 100%;
     }
 
     .modal-date-field {
         width: 100%;
         box-sizing: border-box;
-        font-size: 16px; /* prevents iOS zoom */
+    }
+
+    /* The actual date input must fill its wrapper */
+    #trans-date {
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+        box-sizing: border-box;
     }
 
     .trans-type-toggle {
@@ -383,17 +391,21 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
     .modal-row {
         flex-direction: column;
         gap: 10px;
+        width: 100%;
     }
 
     .trans-category-select,
     .currency-wrapper-modal {
         width: 100%;
-        font-size: 16px; /* prevents iOS zoom */
+        min-width: 0;
+        font-size: 16px;
         box-sizing: border-box;
     }
 
     .modal-input-full {
+        width: 100%;
         font-size: 16px;
+        box-sizing: border-box;
     }
 
     .btn-add-transaction {

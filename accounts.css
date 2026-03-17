@@ -507,21 +507,24 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
     .modal-amount-row {
         width: 100%;
         max-width: 100%;
+        min-width: 0;
+        font-size: 16px;
         box-sizing: border-box;
-        font-size: 16px; /* prevents iOS zoom on focus */
     }
 
     .entry-add-row {
         flex-direction: column;
         width: 100%;
+        box-sizing: border-box;
     }
 
     .entry-date-input,
     .entry-amount-row {
         width: 100%;
         flex: none;
-        box-sizing: border-box;
+        min-width: 0;
         font-size: 16px;
+        box-sizing: border-box;
     }
 
     .entry-confirm-btn {
