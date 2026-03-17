@@ -9,6 +9,15 @@ document.addEventListener('DOMContentLoaded', function() {
     var noteInput     = document.getElementById('trans-note');
     var amountInput   = document.getElementById('trans-amount');
     var categoryInput = document.getElementById('trans-category');
+    var typeSwitch    = document.getElementById('trans-type-switch');
+    var typeToggle    = document.getElementById('trans-type-toggle');
+
+    // Delete modal elements
+    var deleteOverlay  = document.getElementById('delete-trans-overlay');
+    var deleteText     = document.getElementById('delete-trans-text');
+    var cancelDelete   = document.getElementById('cancel-delete-trans');
+    var confirmDelete  = document.getElementById('confirm-delete-trans');
+    var pendingDelete  = null;
 
     var transactions = JSON.parse(localStorage.getItem('transactions')) || [];
     var today        = new Date().toISOString().split('T')[0];
@@ -18,15 +27,22 @@ document.addEventListener('DOMContentLoaded', function() {
     dateInput.max   = today;
     dateInput.value = today;
 
+    // ─── Category placeholder state ────────────
+
+    categoryInput.addEventListener('change', function() {
+        if (categoryInput.value) {
+            categoryInput.classList.remove('unselected');
+            categoryInput.classList.add('selected');
+        }
+    });
+
     // ─── Sort helpers ──────────────────────────
 
-    // Parse DD-MM-YYYY → sortable YYYY-MM-DD
     function parseDateStr(str) {
         if (!str) return '';
         var p = str.split('-');
         if (p.length !== 3) return str;
-        // Handle both DD-MM-YYYY and YYYY-MM-DD
-        if (p[0].length === 4) return str; // already ISO
+        if (p[0].length === 4) return str;
         return p[2] + '-' + p[1] + '-' + p[0];
     }
 
@@ -42,15 +58,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateUI() {
         transList.innerHTML = '';
-        var sorted    = getSorted();
+        var sorted     = getSorted();
         var totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
 
-        // Clamp currentPage
         if (currentPage > totalPages) currentPage = totalPages;
         if (currentPage < 1)          currentPage = 1;
 
-        var start  = (currentPage - 1) * PAGE_SIZE;
-        var slice  = sorted.slice(start, start + PAGE_SIZE);
+        var start = (currentPage - 1) * PAGE_SIZE;
+        var slice = sorted.slice(start, start + PAGE_SIZE);
 
         if (slice.length === 0) {
             transList.innerHTML = '<p class="empty-state">No transactions yet.</p>';
@@ -71,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 (isNeg ? '-' : '+') + ' \u20ac ' +
                                 Math.abs(amount).toLocaleString('nl-NL', { minimumFractionDigits: 2 }) +
                             '</span>' +
-                            '<button class="delete-trans-btn" onclick="deleteTransaction(' + t.originalIndex + ')">\u2715</button>' +
+                            '<button class="delete-trans-btn" onclick="openDeleteModal(' + t.originalIndex + ')">\u2715</button>' +
                         '</div>' +
                     '</div>';
                 transList.appendChild(div);
@@ -101,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function() {
         pagination.style.paddingTop = '16px';
         pagination.style.borderTop  = '1px solid rgba(255,255,255,0.08)';
 
-        // Prev button
         var prev = document.createElement('button');
         prev.className = 'page-btn' + (currentPage === 1 ? ' page-btn-disabled' : '');
         prev.innerHTML = '&lsaquo;';
@@ -109,7 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
         prev.onclick   = function() { currentPage--; updateUI(); };
         pagination.appendChild(prev);
 
-        // Page numbers
         for (var i = 1; i <= totalPages; i++) {
             (function(page) {
                 var btn = document.createElement('button');
@@ -120,7 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })(i);
         }
 
-        // Next button
         var next = document.createElement('button');
         next.className = 'page-btn' + (currentPage === totalPages ? ' page-btn-disabled' : '');
         next.innerHTML = '&rsaquo;';
@@ -129,19 +141,51 @@ document.addEventListener('DOMContentLoaded', function() {
         pagination.appendChild(next);
     }
 
-    // ─── Delete ────────────────────────────────
+    // ─── Delete modal ──────────────────────────
 
-    window.deleteTransaction = function(index) {
-        if (confirm('Are you sure you want to delete this transaction?')) {
-            transactions.splice(index, 1);
-            updateUI();
-        }
+    window.openDeleteModal = function(index) {
+        pendingDelete = index;
+        var t = transactions[index];
+        var amount = Math.abs(parseFloat(t.amount) || 0).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
+        deleteText.innerText = 'Delete "' + t.category + '" (\u20ac ' + amount + ') on ' + t.date + '?';
+        deleteOverlay.style.display = 'flex';
     };
 
-    // ─── Modal ─────────────────────────────────
+    confirmDelete.onclick = function() {
+        if (pendingDelete === null) return;
+        transactions.splice(pendingDelete, 1);
+        pendingDelete = null;
+        deleteOverlay.style.display = 'none';
+        updateUI();
+    };
+
+    cancelDelete.onclick = function() {
+        pendingDelete = null;
+        deleteOverlay.style.display = 'none';
+    };
+
+    // ─── Add modal ─────────────────────────────
+
+    function updateToggleUI() {
+        if (typeSwitch.checked) {
+            typeToggle.classList.remove('is-income');
+        } else {
+            typeToggle.classList.add('is-income');
+        }
+    }
+
+    typeSwitch.addEventListener('change', updateToggleUI);
+    updateToggleUI();
 
     mainAddBtn.onclick = function() {
-        dateInput.value = today;
+        dateInput.value    = today;
+        typeSwitch.checked = true;
+        updateToggleUI();
+        categoryInput.selectedIndex = 0;
+        categoryInput.classList.add('unselected');
+        categoryInput.classList.remove('selected');
+        amountInput.value = '';
+        noteInput.value   = '';
         modalOverlay.style.display = 'flex';
     };
 
@@ -149,6 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.onclick = function(e) {
         if (e.target === modalOverlay) modalOverlay.style.display = 'none';
+        if (e.target === deleteOverlay) { pendingDelete = null; deleteOverlay.style.display = 'none'; }
     };
 
     // ─── Add Transaction ───────────────────────
@@ -159,24 +204,29 @@ document.addEventListener('DOMContentLoaded', function() {
         var date     = dateInput.value;
 
         if (!amount || !category || !date) { showCustomAlert(); return; }
-        if (date > today)                  { alert('Date cannot be in the future.'); return; }
+        if (date > today) { alert('Date cannot be in the future.'); return; }
+
+        var signedAmount = typeSwitch.checked
+            ? -Math.abs(parseFloat(amount))
+            :  Math.abs(parseFloat(amount));
 
         var p = date.split('-');
         transactions.push({
             category: category,
-            amount:   amount,
+            amount:   signedAmount,
             date:     p[2] + '-' + p[1] + '-' + p[0],
             note:     noteInput.value.trim()
         });
 
-        // After adding, go to page 1 (newest entry will be there)
         currentPage = 1;
         updateUI();
 
-        modalOverlay.style.display  = 'none';
-        amountInput.value           = '';
+        modalOverlay.style.display = 'none';
+        amountInput.value          = '';
+        noteInput.value            = '';
         categoryInput.selectedIndex = 0;
-        noteInput.value             = '';
+        categoryInput.classList.add('unselected');
+        categoryInput.classList.remove('selected');
     };
 
     // ─── Custom Alert ──────────────────────────

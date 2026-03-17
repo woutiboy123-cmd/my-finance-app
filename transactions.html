@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transactions - Personal Finance</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="accounts.css">
     <link rel="stylesheet" href="transactions.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="transactions.js" defer></script>
@@ -46,28 +47,45 @@
         <div class="modal-content-box">
             <p class="card-label">New Transaction</p>
             <div class="modal-body-vertical">
-                <input type="date" id="trans-date" onclick="this.showPicker()">
-                <div class="modal-row">
-                    <select id="trans-category">
-                        <option value="" disabled selected>Category</option>
-                        <option value="Food">Groceries</option>
-                        <option value="Rent">Rent / Mortgage</option>
-                        <option value="Transport">Transportation</option>
-                        <option value="Entertainment">Insurance</option>
-                        <option value="Shopping">Dining Out</option>
-                        <option value="Utilities">Utilities</option>
-                        <option value="Hobbies">Hobbies</option>
-                        <option value="Clothing">Clothing</option>
-                        <option value="Personal Care">Personal Care</option>
-                        <option value="Medical Expenses">Medical Expenses</option>
-                        <option value="Gifts">Gifts</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <div class="currency-wrapper-modal">
-                        <span>€</span>
-                        <input type="number" id="trans-amount" placeholder="0,00">
+
+                <!-- Row 1: date + expense/income toggle -->
+                <div class="modal-row modal-row-top">
+                    <input type="date" id="trans-date" onclick="this.showPicker()" class="modal-date-field">
+                    <div class="trans-type-toggle" id="trans-type-toggle">
+                        <span class="toggle-label-expense">Expense</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="trans-type-switch" checked>
+                            <span class="toggle-track">
+                                <span class="toggle-thumb"></span>
+                            </span>
+                        </label>
+                        <span class="toggle-label-income">Income</span>
                     </div>
                 </div>
+
+                <!-- Row 2: category dropdown -->
+                <select id="trans-category" class="trans-category-select unselected">
+                    <option value="" disabled selected hidden>Category</option>
+                    <option value="Food">Groceries</option>
+                    <option value="Rent">Rent / Mortgage</option>
+                    <option value="Transport">Transportation</option>
+                    <option value="Entertainment">Insurance</option>
+                    <option value="Shopping">Dining Out</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Hobbies">Hobbies</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Personal Care">Personal Care</option>
+                    <option value="Medical Expenses">Medical Expenses</option>
+                    <option value="Gifts">Gifts</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <!-- Row 3: amount -->
+                <div class="currency-wrapper-modal">
+                    <span>€</span>
+                    <input type="number" id="trans-amount" placeholder="0,00">
+                </div>
+
                 <input type="text" id="trans-note" class="modal-input-full" placeholder="Note (optional)" maxlength="100">
             </div>
             <div class="modal-footer-btns">
@@ -82,6 +100,20 @@
         <div class="modal-content-box modal-alert">
             <p style="color: var(--text-main, #e0e0e6); font-weight: 500;">Please fill in all required fields.</p>
             <button id="close-alert">OK</button>
+        </div>
+    </div>
+
+    <!-- Delete Transaction Modal -->
+    <div id="delete-trans-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <p class="card-label" style="color: #f87171;">Delete Transaction</p>
+            <div class="modal-body">
+                <p id="delete-trans-text" style="color: var(--text-main, #e0e0e6); font-size: 15px;">Are you sure you want to delete this transaction?</p>
+                <div class="modal-buttons">
+                    <button id="cancel-delete-trans"  class="btn-secondary">Cancel</button>
+                    <button id="confirm-delete-trans" class="btn-delete-confirm">Delete</button>
+                </div>
+            </div>
         </div>
     </div>
 </body>

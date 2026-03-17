@@ -83,6 +83,10 @@
 .amount-positive { color: #4ade80; }
 .amount-negative { color: #f87171; }
 
+/* Override accounts.css .account-item span color for transaction amounts */
+.account-item span.amount-positive { color: #4ade80 !important; }
+.account-item span.amount-negative { color: #f87171 !important; }
+
 .subtle-divider {
     height: 1px;
     background: linear-gradient(to right,
@@ -157,10 +161,22 @@
     gap: 12px;
 }
 
+/* Top row: date + toggle side by side */
+.modal-row-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.modal-date-field {
+    flex: 1;
+    min-width: 0;
+}
+
 /* ─── Modal Inputs ────────────────────────── */
 
 #trans-date,
-#trans-category,
+.trans-category-select,
 .currency-wrapper-modal,
 .modal-input-full {
     background-color: #121212;
@@ -175,38 +191,56 @@
     box-sizing: border-box;
 }
 
-#trans-date,
-#trans-category {
+#trans-date {
     flex: 1;
     width: 100%;
     cursor: pointer;
+    color-scheme: dark;
 }
 
-#trans-date { color-scheme: dark; }
-
 #trans-date:focus,
-#trans-category:focus,
+.trans-category-select:focus,
 .modal-input-full:focus {
     border-color: #4facfe;
 }
 
 /* ─── Category Dropdown ───────────────────── */
 
-#trans-category {
+.trans-category-select {
+    width: 100%;
+    cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
-    text-align: center;
-    text-align-last: center;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    text-align: left;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234facfe%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat;
     background-position: right 16px center;
-    background-size: 12px;
+    background-size: 11px;
+    padding-right: 40px;
 }
 
-#trans-category option {
+/* Placeholder state: light italic */
+.trans-category-select.unselected {
+    color: #888891;
+    font-style: italic;
+}
+
+/* Once a real option is selected: normal */
+.trans-category-select.selected {
+    color: #e0e0e6;
+    font-style: normal;
+}
+
+.trans-category-select option {
     background-color: #1a1d23;
     color: #e0e0e6;
-    text-align: center;
+    font-style: normal;
+    padding: 10px;
+}
+
+.trans-category-select option:disabled {
+    color: #888891;
+    font-style: italic;
 }
 
 /* ─── Amount Input ────────────────────────── */
@@ -368,4 +402,109 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
 .page-btn-disabled {
     opacity: 0.3;
     cursor: not-allowed;
+}
+
+/* ─── Expense / Income Toggle ─────────────── */
+
+.trans-type-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #121212;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px 14px;
+    flex-shrink: 0;
+    transition: border-color 0.3s ease;
+}
+
+/* Labels */
+.toggle-label-expense,
+.toggle-label-income {
+    font-size: 13px;
+    font-weight: 600;
+    transition: opacity 0.3s ease, color 0.3s ease;
+    white-space: nowrap;
+}
+
+.toggle-label-expense {
+    text-align: right;
+    color: #f87171;
+}
+
+.toggle-label-income {
+    text-align: left;
+    color: #888891;
+    opacity: 0.4;
+}
+
+/* When toggled OFF (income active) */
+.trans-type-toggle.is-income .toggle-label-expense {
+    color: #888891;
+    opacity: 0.4;
+}
+
+.trans-type-toggle.is-income .toggle-label-income {
+    color: #4ade80;
+    opacity: 1;
+}
+
+/* Switch track */
+.toggle-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.toggle-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-track {
+    width: 48px;
+    height: 26px;
+    background: rgba(248, 113, 113, 0.3);
+    border-radius: 999px;
+    border: 1px solid rgba(248, 113, 113, 0.5);
+    display: flex;
+    align-items: center;
+    padding: 0 3px;
+    transition: background 0.3s ease, border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.toggle-thumb {
+    width: 18px;
+    height: 18px;
+    background: #f87171;
+    border-radius: 50%;
+    transition: transform 0.3s ease, background 0.3s ease;
+    flex-shrink: 0;
+}
+
+/* Checked = expense (left = red) */
+.toggle-switch input:checked + .toggle-track {
+    background: rgba(248, 113, 113, 0.3);
+    border-color: rgba(248, 113, 113, 0.5);
+    justify-content: flex-start;
+}
+
+.toggle-switch input:checked + .toggle-track .toggle-thumb {
+    background: #f87171;
+    transform: translateX(0);
+}
+
+/* Unchecked = income (right = green) */
+.toggle-switch input:not(:checked) + .toggle-track {
+    background: rgba(74, 222, 128, 0.2);
+    border-color: rgba(74, 222, 128, 0.4);
+}
+
+.toggle-switch input:not(:checked) + .toggle-track .toggle-thumb {
+    background: #4ade80;
+    transform: translateX(22px);
 }

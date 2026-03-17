@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function fmtDate(iso) {
-        if (!iso) return '—';
+        if (!iso) return '';
         var p = iso.split('-');
         return p[2] + '-' + p[1] + '-' + p[0];
     }
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
             div.innerHTML =
                 '<span class="acc-name">' + acc.name + '</span>' +
                 '<div class="account-item-controls">' +
-                    '<span class="acc-date-pill">' + fmtDate(date) + '</span>' +
+                    '<span class="acc-date-pill"' + (fmtDate(date) ? '' : ' style="display:none"') + '>' + fmtDate(date) + '</span>' +
                     '<span class="acc-balance-display">' + fmtMoney(balance) + '</span>' +
                     '<button class="acc-edit-btn" onclick="window.openEntryModal(' + index + ')" title="Add / edit entries">&#9998;</button>' +
                     '<button class="delete-btn" onclick="window.openDeleteModal(' + index + ')">\u2715</button>' +
