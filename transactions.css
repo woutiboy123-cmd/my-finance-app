@@ -54,12 +54,14 @@
     align-items: center;
     justify-content: space-between;
     gap: 15px;
+    padding-left: 330px;
 }
 
 .note-display {
     flex: 1;
-    text-align: center;
-    color: #888891;
+    text-align: left;
+    color: #888891 !important;
+    font-size: 13px;
     font-size: 14px;
     font-style: italic;
     white-space: nowrap;
@@ -72,6 +74,7 @@
     align-items: center;
     justify-content: flex-end;
     gap: 15px;
+    flex-shrink: 0;
 }
 
 .trans-right-side {

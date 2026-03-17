@@ -24,6 +24,17 @@ document.addEventListener('DOMContentLoaded', function() {
     var currentPage  = 1;
     var PAGE_SIZE    = 15;
 
+    // Migrate old category values to display names
+    var categoryMap = {
+        'Food': 'Groceries', 'Rent': 'Rent / Mortgage', 'Transport': 'Transportation',
+        'Entertainment': 'Insurance', 'Shopping': 'Dining Out'
+    };
+    transactions = transactions.map(function(t) {
+        if (categoryMap[t.category]) t.category = categoryMap[t.category];
+        return t;
+    });
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+
     dateInput.max   = today;
     dateInput.value = today;
 
