@@ -199,6 +199,17 @@
     width: 100%;
     cursor: pointer;
     color-scheme: dark;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#trans-date::-webkit-datetime-edit,
+#trans-date::-webkit-datetime-edit-fields-wrapper,
+#trans-date::-webkit-datetime-edit-text,
+#trans-date::-webkit-datetime-edit-day-field,
+#trans-date::-webkit-datetime-edit-month-field,
+#trans-date::-webkit-datetime-edit-year-field {
+    cursor: pointer;
 }
 
 #trans-date:focus,
@@ -341,12 +352,48 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
 
     .modal-content-box {
         width: 95%;
+        max-width: 95vw;
         padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .modal-body-vertical {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Stack date + toggle vertically on small screens */
+    .modal-row-top {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-date-field {
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 16px; /* prevents iOS zoom */
+    }
+
+    .trans-type-toggle {
+        width: 100%;
+        justify-content: center;
+        box-sizing: border-box;
     }
 
     .modal-row {
         flex-direction: column;
         gap: 10px;
+    }
+
+    .trans-category-select,
+    .currency-wrapper-modal {
+        width: 100%;
+        font-size: 16px; /* prevents iOS zoom */
+        box-sizing: border-box;
+    }
+
+    .modal-input-full {
+        font-size: 16px;
     }
 
     .btn-add-transaction {

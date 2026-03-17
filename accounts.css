@@ -320,6 +320,18 @@ input::-webkit-inner-spin-button {
     cursor: pointer;
     transition: border-color 0.2s;
     box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Make the entire field trigger the picker */
+.modal-date-input::-webkit-datetime-edit,
+.modal-date-input::-webkit-datetime-edit-fields-wrapper,
+.modal-date-input::-webkit-datetime-edit-text,
+.modal-date-input::-webkit-datetime-edit-day-field,
+.modal-date-input::-webkit-datetime-edit-month-field,
+.modal-date-input::-webkit-datetime-edit-year-field {
+    cursor: pointer;
 }
 
 .modal-date-input:focus { border-color: var(--accent); }
@@ -482,8 +494,46 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
 @media (max-width: 768px) {
     .charts-grid { grid-template-columns: 1fr; }
     .account-balance-input { width: 80px; font-size: 14px; }
-    .modal-content { width: 95%; padding: 20px; }
-    .entry-add-row { flex-direction: column; }
+
+    .modal-content {
+        width: 95%;
+        max-width: 95vw;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .modal-body input,
+    .modal-date-input,
+    .modal-amount-row {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        font-size: 16px; /* prevents iOS zoom on focus */
+    }
+
+    .entry-add-row {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .entry-date-input,
+    .entry-amount-row {
+        width: 100%;
+        flex: none;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    .entry-confirm-btn {
+        width: 100%;
+    }
+
     .acc-date-pill { display: none; }
-    .btn-secondary, .btn-primary-small, .btn-delete-confirm { padding: 10px 14px; font-size: 13px; }
+
+    .btn-secondary,
+    .btn-primary-small,
+    .btn-delete-confirm {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
 }

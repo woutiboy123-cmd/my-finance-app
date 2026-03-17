@@ -60,7 +60,7 @@
         <div class="modal-content">
             <p class="card-label">New Investment Portfolio</p>
             <div class="modal-body">
-                <input type="text" id="new-account-name" placeholder="Portfolio Name (e.g. S&P 500)">
+                <input type="text" id="new-account-name" autocomplete="off" placeholder="Portfolio Name (e.g. S&P 500)">
                 <div class="modal-buttons">
                     <button id="cancel-modal"  class="btn-secondary">Cancel</button>
                     <button id="confirm-modal" class="btn-primary-small">Add Portfolio</button>
@@ -79,10 +79,10 @@
 
             <!-- Add new entry -->
             <div class="entry-add-row">
-                <input type="date" id="entry-date" class="modal-date-input entry-date-input">
+                <input type="date" id="entry-date" class="modal-date-input entry-date-input" onclick="this.showPicker()">
                 <div class="modal-amount-row entry-amount-row">
                     <span class="modal-currency">&euro;</span>
-                    <input type="number" id="entry-amount" placeholder="0.00" class="modal-amount-input">
+                    <input type="number" id="entry-amount" autocomplete="off" placeholder="0.00" class="modal-amount-input">
                 </div>
                 <button id="confirm-entry" class="btn-primary-small entry-confirm-btn">Add</button>
             </div>
