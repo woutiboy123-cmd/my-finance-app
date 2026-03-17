@@ -19,3 +19,29 @@ async function requireAuth() {
     if (!user) { window.location.replace('index.html'); return null; }
     return user;
 }
+
+// Leest user.id instant uit localStorage — geen netwerkverzoek
+// Alleen gebruiken voor cache-sleutels, niet voor security checks
+function getLocalUserId() {
+    try {
+        var sb = getSupabase();
+        if (!sb) return null;
+        // Supabase slaat sessie op in localStorage
+        var keys = Object.keys(localStorage);
+        for (var i = 0; i < keys.length; i++) {
+            if (keys[i].indexOf('auth-token') !== -1 || keys[i].indexOf('supabase') !== -1) {
+                var val = JSON.parse(localStorage.getItem(keys[i]));
+                if (val && val.user && val.user.id) return val.user.id;
+                if (val && val.access_token) {
+                    // Decode JWT payload to get user id
+                    var parts = val.access_token.split('.');
+                    if (parts.length === 3) {
+                        var payload = JSON.parse(atob(parts[1]));
+                        if (payload.sub) return payload.sub;
+                    }
+                }
+            }
+        }
+    } catch(e) {}
+    return null;
+}

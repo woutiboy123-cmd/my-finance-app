@@ -6,18 +6,33 @@ document.addEventListener('DOMContentLoaded', async function () {
     var netWorthCanvas      = document.getElementById('netWorthChart');
     var transList           = document.getElementById('transactions-list');
 
+
+    // ─── Dashboard cache instant tonen ───────────────────
+    var localUid = getLocalUserId();
+    if (localUid) {
+        try {
+            var _dc = JSON.parse(localStorage.getItem('cache_dashboard_' + localUid));
+            if (_dc) {
+                var _fmt = function(n) { return '\u20ac ' + (parseFloat(n)||0).toLocaleString('nl-NL',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+                var _sd = document.getElementById('dashboard-savings-amount');
+                var _id = document.getElementById('dashboard-investment-amount');
+                var _td = document.getElementById('total-combined-balance');
+                if (_sd) _sd.innerText = _fmt(_dc.totalSavings || 0);
+                if (_id) _id.innerText = _fmt(_dc.totalInvestments || 0);
+                if (_td) _td.innerText = _fmt(_dc.combinedTotal || 0);
+            }
+        } catch(e) {}
+    }
+
     var sb   = getSupabase();
     var user = await requireAuth();
     if (!user) return;
+
 
     var CACHE_KEY = 'cache_dashboard_' + user.id;
 
     function saveCache(data) {
         try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch(e) {}
-    }
-
-    function loadCacheDash() {
-        try { return JSON.parse(localStorage.getItem(CACHE_KEY)); } catch(e) { return null; }
     }
 
     var fmt = function (n) {
@@ -34,14 +49,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (!acc.history || acc.history.length === 0) return 0;
         var sorted = acc.history.slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
         return parseFloat(sorted[sorted.length - 1].balance) || 0;
-    }
-
-    // Show cached data instantly
-    var dashCache = loadCacheDash();
-    if (dashCache) {
-        if (savingsDisplay)      savingsDisplay.innerText      = fmt(dashCache.totalSavings || 0);
-        if (investmentDisplay)   investmentDisplay.innerText   = fmt(dashCache.totalInvestments || 0);
-        if (totalBalanceDisplay) totalBalanceDisplay.innerText = fmt(dashCache.combinedTotal || 0);
     }
 
     // ─── Laad alle data parallel ──────────────────────────

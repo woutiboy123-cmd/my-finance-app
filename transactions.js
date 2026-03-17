@@ -18,12 +18,23 @@ document.addEventListener('DOMContentLoaded', async function () {
     var confirmDelete = document.getElementById('confirm-delete-trans');
     var pendingDelete = null; // { id, index } van de te verwijderen transactie
 
+
+    // ─── Cache instant tonen (voor requireAuth wacht) ────
+    var localUid = getLocalUserId();
+    if (localUid) {
+        var _ck = 'cache_transactions_' + localUid;
+        try {
+            var _cached = JSON.parse(localStorage.getItem(_ck));
+            if (_cached) {
+                transactions = _cached; currentPage = 1; updateUI();
+            }
+        } catch(e) {}
+    }
+
     var sb   = getSupabase();
     var user = await requireAuth();
     if (!user) return;
 
-    // In-memory lijst: [{ id, category, amount, date, note }]
-    var transactions = [];
 
     var CACHE_KEY = 'cache_transactions_' + user.id;
 
@@ -35,6 +46,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || []; } catch(e) { return []; }
     }
 
+    // In-memory lijst: [{ id, category, amount, date, note }]
+    // date is opgeslagen als yyyy-mm-dd in Supabase
+    var transactions = [];
     var today        = new Date().toISOString().split('T')[0];
     var currentPage  = 1;
     var PAGE_SIZE    = 15;

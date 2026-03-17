@@ -6,12 +6,23 @@ document.addEventListener('DOMContentLoaded', async function () {
     var modalOverlay = document.getElementById('modal-overlay');
     var deleteModal  = document.getElementById('delete-modal-overlay');
 
+
+    // ─── Cache instant tonen (voor requireAuth wacht) ────
+    var localUid = getLocalUserId();
+    if (localUid) {
+        var _ck = 'cache_savings_' + localUid;
+        try {
+            var _cached = JSON.parse(localStorage.getItem(_ck));
+            if (_cached.length > 0) {
+                accounts = _cached; updateUI();
+            }
+        } catch(e) {}
+    }
+
     var sb   = getSupabase();
     var user = await requireAuth();
     if (!user) return;
 
-    // In-memory structuur: [{ id, name, history: [{id, date, balance}] }]
-    var accounts = [];
 
     var CACHE_KEY = 'cache_savings_' + user.id;
 
@@ -23,15 +34,15 @@ document.addEventListener('DOMContentLoaded', async function () {
         try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || []; } catch(e) { return []; }
     }
 
-
+    // In-memory structuur: [{ id, name, history: [{id, date, balance}] }]
+    var accounts = [];
 
     // ─── Laad data van Supabase ───────────────────────────
 
     async function loadData() {
-        // Show cached data instantly
+        // Show from proper cache if not already shown
         var cached = loadCache();
         if (cached.length > 0) { accounts = cached; updateUI(); }
-        else { container.innerHTML = ''; }
 
         var r1 = await sb.from('savings_accounts').select('id, name').order('created_at');
         if (r1.error) { console.error(r1.error); return; }
