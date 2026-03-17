@@ -23,8 +23,18 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (!user) return;
 
     // In-memory lijst: [{ id, category, amount, date, note }]
-    // date is opgeslagen als yyyy-mm-dd in Supabase
     var transactions = [];
+
+    var CACHE_KEY = 'cache_transactions_' + user.id;
+
+    function saveCache(data) {
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data.slice(0, 50))); } catch(e) {}
+    }
+
+    function loadCache() {
+        try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || []; } catch(e) { return []; }
+    }
+
     var today        = new Date().toISOString().split('T')[0];
     var currentPage  = 1;
     var PAGE_SIZE    = 15;
@@ -32,7 +42,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     // ─── Laad data van Supabase ───────────────────────────
 
     async function loadData() {
-        transList.innerHTML = '<p class="empty-state">Laden...</p>';
+        var cached = loadCache();
+        if (cached.length > 0) { transactions = cached; currentPage = 1; updateUI(); }
 
         var r = await sb.from('transactions')
             .select('id, category, amount, date, note')
@@ -45,6 +56,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             return { id: t.id, category: t.category, amount: parseFloat(t.amount), date: t.date, note: t.note || '' };
         });
 
+        saveCache(transactions);
         currentPage = 1;
         updateUI();
     }
@@ -172,6 +184,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (r.error) { console.error(r.error); return; }
 
         transactions = transactions.filter(function (t) { return t.id !== id; });
+        saveCache(transactions);
         updateUI();
     };
 
@@ -254,6 +267,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             note:     r.data.note || ''
         });
 
+        saveCache(transactions);
         currentPage = 1;
         updateUI();
 

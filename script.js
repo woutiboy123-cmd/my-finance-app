@@ -10,6 +10,16 @@ document.addEventListener('DOMContentLoaded', async function () {
     var user = await requireAuth();
     if (!user) return;
 
+    var CACHE_KEY = 'cache_dashboard_' + user.id;
+
+    function saveCache(data) {
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch(e) {}
+    }
+
+    function loadCacheDash() {
+        try { return JSON.parse(localStorage.getItem(CACHE_KEY)); } catch(e) { return null; }
+    }
+
     var fmt = function (n) {
         return '\u20ac ' + (parseFloat(n) || 0).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
@@ -24,6 +34,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (!acc.history || acc.history.length === 0) return 0;
         var sorted = acc.history.slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
         return parseFloat(sorted[sorted.length - 1].balance) || 0;
+    }
+
+    // Show cached data instantly
+    var dashCache = loadCacheDash();
+    if (dashCache) {
+        if (savingsDisplay)      savingsDisplay.innerText      = fmt(dashCache.totalSavings || 0);
+        if (investmentDisplay)   investmentDisplay.innerText   = fmt(dashCache.totalInvestments || 0);
+        if (totalBalanceDisplay) totalBalanceDisplay.innerText = fmt(dashCache.combinedTotal || 0);
     }
 
     // ─── Laad alle data parallel ──────────────────────────
@@ -68,6 +86,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (savingsDisplay)      savingsDisplay.innerText      = fmt(totalSavings);
     if (investmentDisplay)   investmentDisplay.innerText   = fmt(totalInvestments);
     if (totalBalanceDisplay) totalBalanceDisplay.innerText = fmt(combinedTotal);
+    saveCache({ totalSavings: totalSavings, totalInvestments: totalInvestments, combinedTotal: combinedTotal });
 
     // ─── Recente transacties ──────────────────────────────
 

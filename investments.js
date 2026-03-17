@@ -13,10 +13,23 @@ document.addEventListener('DOMContentLoaded', async function () {
     // In-memory structuur: [{ id, name, history: [{id, date, balance}] }]
     var accounts = [];
 
+    var CACHE_KEY = 'cache_investments_' + user.id;
+
+    function saveCache(data) {
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch(e) {}
+    }
+
+    function loadCache() {
+        try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || []; } catch(e) { return []; }
+    }
+
+
     // ─── Laad data van Supabase ───────────────────────────
 
     async function loadData() {
-        container.innerHTML = '<p class="empty-state" style="padding:20px;">Laden...</p>';
+        var cached = loadCache();
+        if (cached.length > 0) { accounts = cached; updateUI(); }
+        else { container.innerHTML = ''; }
 
         var r1 = await sb.from('investment_accounts').select('id, name').order('created_at');
         if (r1.error) { console.error(r1.error); return; }
@@ -31,6 +44,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             return { id: acc.id, name: acc.name, history: history };
         });
 
+        saveCache(accounts);
         updateUI();
     }
 
@@ -157,6 +171,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (r.error) { console.error(r.error); return; }
 
         accounts.push({ id: r.data.id, name: r.data.name, history: [] });
+        saveCache(accounts);
         updateUI();
         modalOverlay.style.display = 'none';
         modalInput.value = '';
@@ -225,6 +240,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         entryAmtInp.value = '';
+        saveCache(accounts);
         renderEntryHistory();
         updateUI();
     };
@@ -237,6 +253,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (r.error) { console.error(r.error); return; }
 
         accounts[activeIndex].history = accounts[activeIndex].history.filter(function (e) { return e.id !== entry.id; });
+        saveCache(accounts);
         renderEntryHistory();
         updateUI();
     };
@@ -255,6 +272,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (r.error) { console.error(r.error); return; }
 
         accounts.splice(window.indexToDelete, 1);
+        saveCache(accounts);
         updateUI();
         deleteModal.style.display = 'none';
     };
