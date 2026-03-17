@@ -523,12 +523,21 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
         width: 100%;
         flex: none;
         min-width: 0;
+        max-width: 100%;
         font-size: 16px;
         box-sizing: border-box;
+        padding: 11px 12px !important;
     }
 
     .entry-confirm-btn {
         width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Ensure modal-content padding is accounted for */
+    .entry-history-list {
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .acc-date-pill { display: none; }
