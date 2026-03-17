@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <script src="script.js" defer></script>
     <style>
         .btn-logout {
@@ -35,33 +36,19 @@
             font-weight: 600;
         }
         .view-all-link:hover { text-decoration: underline; }
-
     </style>
     <script>
-        let supabaseClient;
-
-        async function initSupabase() {
-            if (!window.supabase) { console.error('Supabase not found.'); return; }
-            supabaseClient = window.supabase.createClient(
-                'https://pxqbopifausvwlkvomgn.supabase.co',
-                'sb_publishable_QEU1LxylnAea2td7Ond5Cg_XoBBrUWm'
-            );
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) window.location.replace('index.html');
-        }
-
         window.handleLogout = async function () {
-            if (!supabaseClient) return;
+            var sb = getSupabase();
+            if (!sb) return;
             try {
-                const { error } = await supabaseClient.auth.signOut();
-                if (error) throw error;
+                var r = await sb.auth.signOut();
+                if (r.error) throw r.error;
                 window.location.replace('index.html');
             } catch (err) {
                 alert('Logout failed: ' + err.message);
             }
         };
-
-        window.addEventListener('DOMContentLoaded', initSupabase);
     </script>
 </head>
 <body>

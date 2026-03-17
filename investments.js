@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function () {
     var container    = document.getElementById('accounts-container');
     var totalDisplay = document.getElementById('total-investment-amount');
     var addBtn       = document.getElementById('add-account-btn');
@@ -6,28 +6,45 @@ document.addEventListener('DOMContentLoaded', function() {
     var modalOverlay = document.getElementById('modal-overlay');
     var deleteModal  = document.getElementById('delete-modal-overlay');
 
-    // Migrate old format (balance) → new history format
-    var accounts = JSON.parse(localStorage.getItem('investmentAccounts')) || [];
-    accounts = accounts.map(function(acc) {
-        if (!acc.history) {
-            return { name: acc.name, history: parseFloat(acc.balance) > 0
-                ? [{ date: new Date().toISOString().split('T')[0], balance: parseFloat(acc.balance) || 0 }]
-                : [] };
-        }
-        return acc;
-    });
+    var sb   = getSupabase();
+    var user = await requireAuth();
+    if (!user) return;
 
-    // ─── Helpers ─────────────────────────────────────────
+    // In-memory structuur: [{ id, name, history: [{id, date, balance}] }]
+    var accounts = [];
+
+    // ─── Laad data van Supabase ───────────────────────────
+
+    async function loadData() {
+        container.innerHTML = '<p class="empty-state" style="padding:20px;">Laden...</p>';
+
+        var r1 = await sb.from('investment_accounts').select('id, name').order('created_at');
+        if (r1.error) { console.error(r1.error); return; }
+
+        var r2 = await sb.from('investment_entries').select('id, account_id, date, balance').order('date');
+        if (r2.error) { console.error(r2.error); return; }
+
+        accounts = (r1.data || []).map(function (acc) {
+            var history = (r2.data || [])
+                .filter(function (e) { return e.account_id === acc.id; })
+                .map(function (e) { return { id: e.id, date: e.date, balance: parseFloat(e.balance) }; });
+            return { id: acc.id, name: acc.name, history: history };
+        });
+
+        updateUI();
+    }
+
+    // ─── Helpers ──────────────────────────────────────────
 
     function getLatestBalance(acc) {
         if (!acc.history || acc.history.length === 0) return 0;
-        var sorted = acc.history.slice().sort(function(a, b) { return a.date.localeCompare(b.date); });
+        var sorted = acc.history.slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
         return parseFloat(sorted[sorted.length - 1].balance) || 0;
     }
 
     function getLatestDate(acc) {
         if (!acc.history || acc.history.length === 0) return null;
-        var sorted = acc.history.slice().sort(function(a, b) { return a.date.localeCompare(b.date); });
+        var sorted = acc.history.slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
         return sorted[sorted.length - 1].date;
     }
 
@@ -41,15 +58,13 @@ document.addEventListener('DOMContentLoaded', function() {
         return '\u20ac ' + (parseFloat(n) || 0).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
     }
 
-    function save() { localStorage.setItem('investmentAccounts', JSON.stringify(accounts)); }
-
-    // ─── Render ──────────────────────────────────────────
+    // ─── Render ───────────────────────────────────────────
 
     function updateUI() {
         container.innerHTML = '';
         var total = 0;
 
-        accounts.forEach(function(acc, index) {
+        accounts.forEach(function (acc, index) {
             var balance = getLatestBalance(acc);
             var date    = getLatestDate(acc);
             total += balance;
@@ -61,36 +76,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 '<div class="account-item-controls">' +
                     '<span class="acc-date-pill"' + (fmtDate(date) ? '' : ' style="display:none"') + '>' + fmtDate(date) + '</span>' +
                     '<span class="acc-balance-display">' + fmtMoney(balance) + '</span>' +
-                    '<button class="acc-edit-btn" onclick="window.openEntryModal(' + index + ')" title="Add / edit entries">&#9998;</button>' +
+                    '<button class="acc-edit-btn" onclick="window.openEntryModal(' + index + ')" title="Entries bewerken">&#9998;</button>' +
                     '<button class="delete-btn" onclick="window.openDeleteModal(' + index + ')">\u2715</button>' +
                 '</div>';
             container.appendChild(div);
         });
 
         totalDisplay.innerText = fmtMoney(total);
-        save();
         updateChart();
     }
 
-    // ─── Chart ───────────────────────────────────────────
+    // ─── Chart ────────────────────────────────────────────
 
     var chartElem = document.getElementById('yearlyInvestmentChart');
     var investChart;
 
     function buildChartData() {
         var byDate = {};
-        accounts.forEach(function(acc) {
-            (acc.history || []).forEach(function(e) { byDate[e.date] = true; });
+        accounts.forEach(function (acc) {
+            (acc.history || []).forEach(function (e) { byDate[e.date] = true; });
         });
         var dates = Object.keys(byDate).sort();
         if (dates.length === 0) return { labels: [], data: [] };
 
-        var totals = dates.map(function(date) {
+        var totals = dates.map(function (date) {
             var sum = 0;
-            accounts.forEach(function(acc) {
-                var sorted = (acc.history || []).slice().sort(function(a,b){ return a.date.localeCompare(b.date); });
-                var last = 0;
-                sorted.forEach(function(e) { if (e.date <= date) last = parseFloat(e.balance) || 0; });
+            accounts.forEach(function (acc) {
+                var sorted = (acc.history || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+                var last   = 0;
+                sorted.forEach(function (e) { if (e.date <= date) last = parseFloat(e.balance) || 0; });
                 sum += last;
             });
             return sum;
@@ -107,60 +121,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 type: 'line',
                 data: {
                     labels: cd.labels,
-                    datasets: [{
-                        label: 'Savings',
-                        data: cd.data,
-                        borderColor: '#4ade80',
-                        backgroundColor: 'rgba(74,222,128,0.08)',
-                        fill: true, tension: 0.4, borderWidth: 2.5,
-                        pointRadius: 5, pointBackgroundColor: '#4ade80',
-                        pointBorderColor: '#0b0e14', pointBorderWidth: 2, pointHoverRadius: 7
-                    }]
+                    datasets: [{ label: 'Investments', data: cd.data, borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.08)', fill: true, tension: 0.4, borderWidth: 2.5, pointRadius: 5, pointBackgroundColor: '#4ade80', pointBorderColor: '#0b0e14', pointBorderWidth: 2, pointHoverRadius: 7 }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
                         legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(11,14,20,0.95)',
-                            titleColor: '#888891', bodyColor: '#fff',
-                            borderColor: 'rgba(74,222,128,0.3)', borderWidth: 1, padding: 12,
-                            callbacks: { label: function(c) { return '  \u20ac ' + c.raw.toLocaleString('nl-NL', { minimumFractionDigits: 2 }); } }
-                        }
+                        tooltip: { backgroundColor: 'rgba(11,14,20,0.95)', titleColor: '#888891', bodyColor: '#fff', borderColor: 'rgba(74,222,128,0.3)', borderWidth: 1, padding: 12, callbacks: { label: function (c) { return '  \u20ac ' + c.raw.toLocaleString('nl-NL', { minimumFractionDigits: 2 }); } } }
                     },
                     scales: {
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888891', callback: function(v) { return '\u20ac ' + v.toLocaleString('nl-NL'); } } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888891', callback: function (v) { return '\u20ac ' + v.toLocaleString('nl-NL'); } } },
                         x: { grid: { display: false }, ticks: { color: '#888891', maxTicksLimit: 8 } }
                     }
                 }
             });
         } else {
-            investChart.data.labels = cd.labels;
+            investChart.data.labels           = cd.labels;
             investChart.data.datasets[0].data = cd.data;
             investChart.update();
         }
     }
 
-    // ─── Add account (name only) ──────────────────────────
+    // ─── Portfolio toevoegen ──────────────────────────────
 
-    addBtn.onclick = function() {
-        modalOverlay.style.display = 'flex';
-        modalInput.focus();
-    };
+    addBtn.onclick = function () { modalOverlay.style.display = 'flex'; modalInput.focus(); };
 
-    document.getElementById('confirm-modal').onclick = function() {
+    document.getElementById('confirm-modal').onclick = async function () {
         var name = modalInput.value.trim();
         if (!name) return;
-        accounts.push({ name: name, history: [] });
+
+        var r = await sb.from('investment_accounts')
+            .insert({ name: name, user_id: user.id })
+            .select('id, name').single();
+        if (r.error) { console.error(r.error); return; }
+
+        accounts.push({ id: r.data.id, name: r.data.name, history: [] });
         updateUI();
         modalOverlay.style.display = 'none';
         modalInput.value = '';
     };
 
-    document.getElementById('cancel-modal').onclick = function() { modalOverlay.style.display = 'none'; };
+    document.getElementById('cancel-modal').onclick = function () { modalOverlay.style.display = 'none'; };
 
-    // ─── Entry modal (add / view history) ────────────────
+    // ─── Entry modal (history bekijken / toevoegen) ───────
 
     var entryModal      = document.getElementById('entry-modal-overlay');
     var entryModalTitle = document.getElementById('entry-modal-title');
@@ -169,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var entryList       = document.getElementById('entry-history-list');
     var activeIndex     = null;
 
-    window.openEntryModal = function(index) {
+    window.openEntryModal = function (index) {
         activeIndex = index;
         entryModalTitle.innerText = accounts[index].name;
         var today = new Date().toISOString().split('T')[0];
@@ -183,12 +187,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderEntryHistory() {
         entryList.innerHTML = '';
-        var sorted = (accounts[activeIndex].history || []).slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+        var sorted = (accounts[activeIndex].history || []).slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
         if (sorted.length === 0) {
-            entryList.innerHTML = '<p class="entry-empty">No entries yet. Add one above.</p>';
+            entryList.innerHTML = '<p class="entry-empty">Nog geen entries. Voeg er een toe hierboven.</p>';
             return;
         }
-        sorted.forEach(function(e, i) {
+        sorted.forEach(function (e, i) {
             var row = document.createElement('div');
             row.className = 'entry-row';
             row.innerHTML =
@@ -199,53 +203,64 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    document.getElementById('confirm-entry').onclick = function() {
+    document.getElementById('confirm-entry').onclick = async function () {
         var date    = entryDateInp.value;
         var balance = parseFloat(entryAmtInp.value.replace(',', '.'));
         if (!date || isNaN(balance)) return;
 
-        // Replace if same date already exists, otherwise add
-        var history = accounts[activeIndex].history || [];
-        var existing = history.findIndex(function(e) { return e.date === date; });
-        if (existing >= 0) {
-            history[existing].balance = balance;
+        var acc      = accounts[activeIndex];
+        var existing = acc.history.find(function (e) { return e.date === date; });
+
+        if (existing) {
+            var r = await sb.from('investment_entries').update({ balance: balance }).eq('id', existing.id);
+            if (r.error) { console.error(r.error); return; }
+            existing.balance = balance;
         } else {
-            history.push({ date: date, balance: balance });
+            var r = await sb.from('investment_entries')
+                .insert({ account_id: acc.id, user_id: user.id, date: date, balance: balance })
+                .select('id, date, balance').single();
+            if (r.error) { console.error(r.error); return; }
+            acc.history.push({ id: r.data.id, date: r.data.date, balance: parseFloat(r.data.balance) });
+            acc.history.sort(function (a, b) { return a.date.localeCompare(b.date); });
         }
-        history.sort(function(a,b){ return a.date.localeCompare(b.date); });
-        accounts[activeIndex].history = history;
+
         entryAmtInp.value = '';
         renderEntryHistory();
         updateUI();
     };
 
-    window.deleteEntry = function(sortedIndex) {
-        var sorted = (accounts[activeIndex].history || []).slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
-        var entryToDelete = sorted[sortedIndex];
-        accounts[activeIndex].history = accounts[activeIndex].history.filter(function(e) {
-            return !(e.date === entryToDelete.date && e.balance === entryToDelete.balance);
-        });
+    window.deleteEntry = async function (sortedIndex) {
+        var sorted = (accounts[activeIndex].history || []).slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
+        var entry  = sorted[sortedIndex];
+
+        var r = await sb.from('investment_entries').delete().eq('id', entry.id);
+        if (r.error) { console.error(r.error); return; }
+
+        accounts[activeIndex].history = accounts[activeIndex].history.filter(function (e) { return e.id !== entry.id; });
         renderEntryHistory();
         updateUI();
     };
 
-    document.getElementById('close-entry-modal').onclick = function() { entryModal.style.display = 'none'; };
+    document.getElementById('close-entry-modal').onclick = function () { entryModal.style.display = 'none'; };
 
-    // ─── Delete account ───────────────────────────────────
+    // ─── Portfolio verwijderen ────────────────────────────
 
-    window.openDeleteModal = function(index) {
-        window.indexToDelete = index;
-        deleteModal.style.display = 'flex';
-    };
+    window.openDeleteModal = function (index) { window.indexToDelete = index; deleteModal.style.display = 'flex'; };
 
-    document.getElementById('confirm-delete').onclick = function() {
+    document.getElementById('confirm-delete').onclick = async function () {
         if (window.indexToDelete === undefined) return;
+        var acc = accounts[window.indexToDelete];
+
+        var r = await sb.from('investment_accounts').delete().eq('id', acc.id);
+        if (r.error) { console.error(r.error); return; }
+
         accounts.splice(window.indexToDelete, 1);
         updateUI();
         deleteModal.style.display = 'none';
     };
 
-    document.getElementById('cancel-delete').onclick = function() { deleteModal.style.display = 'none'; };
+    document.getElementById('cancel-delete').onclick = function () { deleteModal.style.display = 'none'; };
 
-    updateUI();
+    // ─── Start ────────────────────────────────────────────
+    await loadData();
 });

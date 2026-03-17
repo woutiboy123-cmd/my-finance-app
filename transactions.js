@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function () {
     var mainAddBtn    = document.getElementById('main-add-btn');
     var modalOverlay  = document.getElementById('add-modal-overlay');
     var cancelBtn     = document.getElementById('cancel-add-modal');
@@ -12,60 +12,59 @@ document.addEventListener('DOMContentLoaded', function() {
     var typeSwitch    = document.getElementById('trans-type-switch');
     var typeToggle    = document.getElementById('trans-type-toggle');
 
-    // Delete modal elements
-    var deleteOverlay  = document.getElementById('delete-trans-overlay');
-    var deleteText     = document.getElementById('delete-trans-text');
-    var cancelDelete   = document.getElementById('cancel-delete-trans');
-    var confirmDelete  = document.getElementById('confirm-delete-trans');
-    var pendingDelete  = null;
+    var deleteOverlay = document.getElementById('delete-trans-overlay');
+    var deleteText    = document.getElementById('delete-trans-text');
+    var cancelDelete  = document.getElementById('cancel-delete-trans');
+    var confirmDelete = document.getElementById('confirm-delete-trans');
+    var pendingDelete = null; // { id, index } van de te verwijderen transactie
 
-    var transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    var sb   = getSupabase();
+    var user = await requireAuth();
+    if (!user) return;
+
+    // In-memory lijst: [{ id, category, amount, date, note }]
+    // date is opgeslagen als yyyy-mm-dd in Supabase
+    var transactions = [];
     var today        = new Date().toISOString().split('T')[0];
     var currentPage  = 1;
     var PAGE_SIZE    = 15;
 
-    // Migrate old category values to display names
-    var categoryMap = {
-        'Food': 'Groceries', 'Rent': 'Rent / Mortgage', 'Transport': 'Transportation',
-        'Entertainment': 'Insurance', 'Shopping': 'Dining Out'
-    };
-    transactions = transactions.map(function(t) {
-        if (categoryMap[t.category]) t.category = categoryMap[t.category];
-        return t;
-    });
-    localStorage.setItem('transactions', JSON.stringify(transactions));
+    // ─── Laad data van Supabase ───────────────────────────
 
-    dateInput.max   = today;
-    dateInput.value = today;
+    async function loadData() {
+        transList.innerHTML = '<p class="empty-state">Laden...</p>';
 
-    // ─── Category placeholder state ────────────
+        var r = await sb.from('transactions')
+            .select('id, category, amount, date, note')
+            .order('date', { ascending: false })
+            .order('created_at', { ascending: false });
 
-    categoryInput.addEventListener('change', function() {
-        if (categoryInput.value) {
-            categoryInput.classList.remove('unselected');
-            categoryInput.classList.add('selected');
-        }
-    });
+        if (r.error) { console.error(r.error); return; }
 
-    // ─── Sort helpers ──────────────────────────
+        transactions = (r.data || []).map(function (t) {
+            return { id: t.id, category: t.category, amount: parseFloat(t.amount), date: t.date, note: t.note || '' };
+        });
 
-    function parseDateStr(str) {
-        if (!str) return '';
-        var p = str.split('-');
-        if (p.length !== 3) return str;
-        if (p[0].length === 4) return str;
+        currentPage = 1;
+        updateUI();
+    }
+
+    // ─── Helpers ──────────────────────────────────────────
+
+    // Zet yyyy-mm-dd om naar dd-mm-yyyy voor weergave
+    function fmtDate(iso) {
+        if (!iso) return '';
+        var p = iso.split('-');
         return p[2] + '-' + p[1] + '-' + p[0];
     }
 
     function getSorted() {
-        return transactions
-            .map(function(t, i) { return Object.assign({}, t, { originalIndex: i }); })
-            .sort(function(a, b) {
-                return parseDateStr(b.date).localeCompare(parseDateStr(a.date));
-            });
+        return transactions.slice().sort(function (a, b) {
+            return b.date.localeCompare(a.date);
+        });
     }
 
-    // ─── Render ────────────────────────────────
+    // ─── Render ───────────────────────────────────────────
 
     function updateUI() {
         transList.innerHTML = '';
@@ -79,9 +78,9 @@ document.addEventListener('DOMContentLoaded', function() {
         var slice = sorted.slice(start, start + PAGE_SIZE);
 
         if (slice.length === 0) {
-            transList.innerHTML = '<p class="empty-state">No transactions yet.</p>';
+            transList.innerHTML = '<p class="empty-state">Nog geen transacties.</p>';
         } else {
-            slice.forEach(function(t, index) {
+            slice.forEach(function (t, index) {
                 var amount = parseFloat(t.amount) || 0;
                 var isNeg  = amount < 0;
 
@@ -89,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 div.className = 'account-item';
                 div.innerHTML =
                     '<span class="category-display">' + t.category + '</span>' +
-                    '<span class="date-display">' + t.date + '</span>' +
+                    '<span class="date-display">' + fmtDate(t.date) + '</span>' +
                     '<div class="note-amount-wrapper">' +
                         '<span class="note-display">' + (t.note || '') + '</span>' +
                         '<div class="trans-right-side-wrapper">' +
@@ -97,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 (isNeg ? '-' : '+') + ' \u20ac ' +
                                 Math.abs(amount).toLocaleString('nl-NL', { minimumFractionDigits: 2 }) +
                             '</span>' +
-                            '<button class="delete-trans-btn" onclick="openDeleteModal(' + t.originalIndex + ')">\u2715</button>' +
+                            '<button class="delete-trans-btn" onclick="openDeleteModal(\'' + t.id + '\')">\u2715</button>' +
                         '</div>' +
                     '</div>';
                 transList.appendChild(div);
@@ -111,10 +110,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         renderPagination(totalPages);
-        localStorage.setItem('transactions', JSON.stringify(transactions));
     }
 
-    // ─── Pagination ────────────────────────────
+    // ─── Pagination ───────────────────────────────────────
 
     function renderPagination(totalPages) {
         pagination.innerHTML = '';
@@ -131,15 +129,15 @@ document.addEventListener('DOMContentLoaded', function() {
         prev.className = 'page-btn' + (currentPage === 1 ? ' page-btn-disabled' : '');
         prev.innerHTML = '&lsaquo;';
         prev.disabled  = currentPage === 1;
-        prev.onclick   = function() { currentPage--; updateUI(); };
+        prev.onclick   = function () { currentPage--; updateUI(); };
         pagination.appendChild(prev);
 
         for (var i = 1; i <= totalPages; i++) {
-            (function(page) {
+            (function (page) {
                 var btn = document.createElement('button');
                 btn.className = 'page-btn' + (page === currentPage ? ' page-btn-active' : '');
                 btn.innerText = page;
-                btn.onclick   = function() { currentPage = page; updateUI(); };
+                btn.onclick   = function () { currentPage = page; updateUI(); };
                 pagination.appendChild(btn);
             })(i);
         }
@@ -148,34 +146,38 @@ document.addEventListener('DOMContentLoaded', function() {
         next.className = 'page-btn' + (currentPage === totalPages ? ' page-btn-disabled' : '');
         next.innerHTML = '&rsaquo;';
         next.disabled  = currentPage === totalPages;
-        next.onclick   = function() { currentPage++; updateUI(); };
+        next.onclick   = function () { currentPage++; updateUI(); };
         pagination.appendChild(next);
     }
 
-    // ─── Delete modal ──────────────────────────
+    // ─── Delete modal ─────────────────────────────────────
 
-    window.openDeleteModal = function(index) {
-        pendingDelete = index;
-        var t = transactions[index];
+    // id is nu een UUID string (niet meer een array-index)
+    window.openDeleteModal = function (id) {
+        var t = transactions.find(function (x) { return x.id === id; });
+        if (!t) return;
+        pendingDelete = id;
         var amount = Math.abs(parseFloat(t.amount) || 0).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
-        deleteText.innerText = 'Delete "' + t.category + '" (\u20ac ' + amount + ') on ' + t.date + '?';
+        deleteText.innerText = 'Verwijder "' + t.category + '" (\u20ac ' + amount + ') op ' + fmtDate(t.date) + '?';
         deleteOverlay.style.display = 'flex';
     };
 
-    confirmDelete.onclick = function() {
-        if (pendingDelete === null) return;
-        transactions.splice(pendingDelete, 1);
+    confirmDelete.onclick = async function () {
+        if (!pendingDelete) return;
+        var id = pendingDelete;
         pendingDelete = null;
         deleteOverlay.style.display = 'none';
+
+        var r = await sb.from('transactions').delete().eq('id', id);
+        if (r.error) { console.error(r.error); return; }
+
+        transactions = transactions.filter(function (t) { return t.id !== id; });
         updateUI();
     };
 
-    cancelDelete.onclick = function() {
-        pendingDelete = null;
-        deleteOverlay.style.display = 'none';
-    };
+    cancelDelete.onclick = function () { pendingDelete = null; deleteOverlay.style.display = 'none'; };
 
-    // ─── Add modal ─────────────────────────────
+    // ─── Type toggle (expense / income) ──────────────────
 
     function updateToggleUI() {
         if (typeSwitch.checked) {
@@ -188,8 +190,11 @@ document.addEventListener('DOMContentLoaded', function() {
     typeSwitch.addEventListener('change', updateToggleUI);
     updateToggleUI();
 
-    mainAddBtn.onclick = function() {
+    // ─── Add modal ─────────────────────────────────────────
+
+    mainAddBtn.onclick = function () {
         dateInput.value    = today;
+        dateInput.max      = today;
         typeSwitch.checked = true;
         updateToggleUI();
         categoryInput.selectedIndex = 0;
@@ -200,33 +205,53 @@ document.addEventListener('DOMContentLoaded', function() {
         modalOverlay.style.display = 'flex';
     };
 
-    cancelBtn.onclick = function() { modalOverlay.style.display = 'none'; };
+    cancelBtn.onclick = function () { modalOverlay.style.display = 'none'; };
 
-    window.onclick = function(e) {
+    categoryInput.addEventListener('change', function () {
+        if (categoryInput.value) {
+            categoryInput.classList.remove('unselected');
+            categoryInput.classList.add('selected');
+        }
+    });
+
+    window.onclick = function (e) {
         if (e.target === modalOverlay) modalOverlay.style.display = 'none';
         if (e.target === deleteOverlay) { pendingDelete = null; deleteOverlay.style.display = 'none'; }
     };
 
-    // ─── Add Transaction ───────────────────────
+    // ─── Transactie toevoegen ─────────────────────────────
 
-    confirmBtn.onclick = function() {
+    confirmBtn.onclick = async function () {
         var amount   = amountInput.value;
         var category = categoryInput.value;
         var date     = dateInput.value;
 
         if (!amount || !category || !date) { showCustomAlert(); return; }
-        if (date > today) { alert('Date cannot be in the future.'); return; }
+        if (date > today) { alert('Datum mag niet in de toekomst liggen.'); return; }
 
         var signedAmount = typeSwitch.checked
             ? -Math.abs(parseFloat(amount))
             :  Math.abs(parseFloat(amount));
 
-        var p = date.split('-');
-        transactions.push({
-            category: category,
-            amount:   signedAmount,
-            date:     p[2] + '-' + p[1] + '-' + p[0],
-            note:     noteInput.value.trim()
+        var r = await sb.from('transactions')
+            .insert({
+                user_id:  user.id,
+                category: category,
+                amount:   signedAmount,
+                date:     date,          // yyyy-mm-dd (native van date-input)
+                note:     noteInput.value.trim()
+            })
+            .select('id, category, amount, date, note')
+            .single();
+
+        if (r.error) { console.error(r.error); return; }
+
+        transactions.unshift({
+            id:       r.data.id,
+            category: r.data.category,
+            amount:   parseFloat(r.data.amount),
+            date:     r.data.date,
+            note:     r.data.note || ''
         });
 
         currentPage = 1;
@@ -240,15 +265,16 @@ document.addEventListener('DOMContentLoaded', function() {
         categoryInput.classList.remove('selected');
     };
 
-    // ─── Custom Alert ──────────────────────────
+    // ─── Custom alert ─────────────────────────────────────
 
     function showCustomAlert() {
         var alertBox = document.getElementById('custom-alert');
         alertBox.style.display = 'flex';
-        document.getElementById('close-alert').onclick = function() {
+        document.getElementById('close-alert').onclick = function () {
             alertBox.style.display = 'none';
         };
     }
 
-    updateUI();
+    // ─── Start ────────────────────────────────────────────
+    await loadData();
 });
