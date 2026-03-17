@@ -30,7 +30,7 @@
 /* ─── Transaction List ────────────────────── */
 
 .account-item {
-    padding: 25px 10px;
+    padding: 16px 10px;
     display: grid;
     grid-template-columns: 1fr 150px 1fr;
     align-items: center;
@@ -323,4 +323,49 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
         padding: 10px 16px;
         font-size: 13px;
     }
+}
+
+/* ─── Pagination ──────────────────────────── */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+.page-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #888891;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.page-btn:hover:not(.page-btn-disabled):not(.page-btn-active) {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e6;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.page-btn-active {
+    background: rgba(79, 172, 254, 0.15);
+    border-color: #4facfe;
+    color: #4facfe;
+    font-weight: 700;
+    cursor: default;
+}
+
+.page-btn-disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }

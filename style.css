@@ -322,3 +322,43 @@ body {
     .main-content { padding: 16px 12px; }
     .nav-item { font-size: 12px; padding: 6px 10px; }
 }
+
+/* ─── Custom Scrollbar ────────────────────── */
+
+::-webkit-scrollbar {
+    width: 10px !important;
+    height: 10px !important;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(79, 172, 254, 0.35);
+    border-radius: 10px;
+    border: 2px solid var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(79, 172, 254, 0.6);
+}
+
+::-webkit-scrollbar-button:start:decrement,
+::-webkit-scrollbar-button:end:increment {
+    display: none;
+    height: 0;
+    width: 0;
+    background: transparent;
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(79, 172, 254, 0.35) rgba(255, 255, 255, 0.03);
+}

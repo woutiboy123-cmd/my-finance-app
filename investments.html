@@ -46,8 +46,8 @@
                 </div>
 
                 <div class="card">
-                    <p class="card-label">Yearly Investment Progress</p>
-                    <div class="chart-container">
+                    <p class="card-label">Investment Progress</p>
+                    <div class="chart-container" style="height: 280px;">
                         <canvas id="yearlyInvestmentChart"></canvas>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
         </main>
     </div>
 
-    <!-- Add Portfolio Modal -->
+    <!-- Add Portfolio Modal (name only) -->
     <div id="modal-overlay" class="modal-overlay">
         <div class="modal-content">
             <p class="card-label">New Investment Portfolio</p>
@@ -69,12 +69,39 @@
         </div>
     </div>
 
-    <!-- Delete Portfolio Modal -->
+    <!-- Entry history modal -->
+    <div id="entry-modal-overlay" class="modal-overlay">
+        <div class="modal-content entry-modal-content">
+            <div class="entry-modal-header">
+                <p class="card-label">Balance History</p>
+                <h3 id="entry-modal-title" class="entry-modal-account-name"></h3>
+            </div>
+
+            <!-- Add new entry -->
+            <div class="entry-add-row">
+                <input type="date" id="entry-date" class="modal-date-input entry-date-input">
+                <div class="modal-amount-row entry-amount-row">
+                    <span class="modal-currency">&euro;</span>
+                    <input type="number" id="entry-amount" placeholder="0.00" class="modal-amount-input">
+                </div>
+                <button id="confirm-entry" class="btn-primary-small entry-confirm-btn">Add</button>
+            </div>
+
+            <!-- History list -->
+            <div id="entry-history-list" class="entry-history-list"></div>
+
+            <div class="modal-buttons" style="justify-content: flex-end; margin-top: 8px;">
+                <button id="close-entry-modal" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
     <div id="delete-modal-overlay" class="modal-overlay">
         <div class="modal-content">
-            <p class="card-label" style="color: #f87171;">Delete Portfolio</p>
+            <p class="card-label" style="color: #f87171;">Delete Account</p>
             <div class="modal-body">
-                <p id="delete-modal-text" style="color: var(--text-main); font-size: 15px;">Are you sure?</p>
+                <p id="delete-modal-text" style="color: var(--text-main); font-size: 15px;">Are you sure you want to delete this account?</p>
                 <div class="modal-buttons">
                     <button id="cancel-delete"  class="btn-secondary">Cancel</button>
                     <button id="confirm-delete" class="btn-delete-confirm">Delete</button>
