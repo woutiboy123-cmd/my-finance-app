@@ -1,57 +1,55 @@
 document.addEventListener('DOMContentLoaded', async function () {
-    var container    = document.getElementById('accounts-container');
-    var totalDisplay = document.getElementById('total-savings-amount');
-    var addBtn       = document.getElementById('add-account-btn');
-    var modalInput   = document.getElementById('new-account-name');
-    var modalOverlay = document.getElementById('modal-overlay');
-    var deleteModal  = document.getElementById('delete-modal-overlay');
+    const container    = document.getElementById('accounts-container');
+    const totalDisplay = document.getElementById('total-savings-amount');
+    const addBtn       = document.getElementById('add-account-btn');
+    const modalInput   = document.getElementById('new-account-name');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const deleteModal  = document.getElementById('delete-modal-overlay');
 
+    // In-memory structure: [{ id, name, history: [{id, date, balance}] }]
+    // Declared first so the cache block below can safely reference it.
+    let accounts = [];
 
-    // ─── Cache instant tonen (voor requireAuth wacht) ────
-    var localUid = getLocalUserId();
+    // ─── Show cache immediately (before requireAuth waits) ───
+    const localUid = getLocalUserId();
     if (localUid) {
-        var _ck = 'cache_savings_' + localUid;
         try {
-            var _cached = JSON.parse(localStorage.getItem(_ck));
-            if (_cached.length > 0) {
-                accounts = _cached; updateUI();
+            const cached = JSON.parse(localStorage.getItem('cache_savings_' + localUid));
+            if (Array.isArray(cached) && cached.length > 0) {
+                accounts = cached;
+                updateUI();
             }
-        } catch(e) {}
+        } catch (e) {}
     }
 
-    var sb   = getSupabase();
-    var user = await requireAuth();
+    const sb   = getSupabase();
+    const user = await requireAuth();
     if (!user) return;
 
-
-    var CACHE_KEY = 'cache_savings_' + user.id;
+    const CACHE_KEY = 'cache_savings_' + user.id;
 
     function saveCache(data) {
-        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch(e) {}
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) {}
     }
 
     function loadCache() {
-        try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || []; } catch(e) { return []; }
+        try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || []; } catch (e) { return []; }
     }
 
-    // In-memory structuur: [{ id, name, history: [{id, date, balance}] }]
-    var accounts = [];
-
-    // ─── Laad data van Supabase ───────────────────────────
+    // ─── Load data from Supabase ──────────────────────────
 
     async function loadData() {
-        // Show from proper cache if not already shown
-        var cached = loadCache();
-        if (cached.length > 0) { accounts = cached; updateUI(); }
+        const cached = loadCache();
+        if (cached.length > 0 && accounts.length === 0) { accounts = cached; updateUI(); }
 
-        var r1 = await sb.from('savings_accounts').select('id, name').order('created_at');
+        const r1 = await sb.from('savings_accounts').select('id, name').order('created_at');
         if (r1.error) { console.error(r1.error); return; }
 
-        var r2 = await sb.from('savings_entries').select('id, account_id, date, balance').order('date');
+        const r2 = await sb.from('savings_entries').select('id, account_id, date, balance').order('date');
         if (r2.error) { console.error(r2.error); return; }
 
         accounts = (r1.data || []).map(function (acc) {
-            var history = (r2.data || [])
+            const history = (r2.data || [])
                 .filter(function (e) { return e.account_id === acc.id; })
                 .map(function (e) { return { id: e.id, date: e.date, balance: parseFloat(e.balance) }; });
             return { id: acc.id, name: acc.name, history: history };
@@ -65,19 +63,19 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     function getLatestBalance(acc) {
         if (!acc.history || acc.history.length === 0) return 0;
-        var sorted = acc.history.slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+        const sorted = acc.history.slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
         return parseFloat(sorted[sorted.length - 1].balance) || 0;
     }
 
     function getLatestDate(acc) {
         if (!acc.history || acc.history.length === 0) return null;
-        var sorted = acc.history.slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+        const sorted = acc.history.slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
         return sorted[sorted.length - 1].date;
     }
 
     function fmtDate(iso) {
         if (!iso) return '';
-        var p = iso.split('-');
+        const p = iso.split('-');
         return p[2] + '-' + p[1] + '-' + p[0];
     }
 
@@ -89,21 +87,22 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     function updateUI() {
         container.innerHTML = '';
-        var total = 0;
+        let total = 0;
 
         accounts.forEach(function (acc, index) {
-            var balance = getLatestBalance(acc);
-            var date    = getLatestDate(acc);
+            const balance = getLatestBalance(acc);
+            const date    = getLatestDate(acc);
+            const datePill = fmtDate(date);
             total += balance;
 
-            var div = document.createElement('div');
+            const div = document.createElement('div');
             div.className = 'account-item';
             div.innerHTML =
-                '<span class="acc-name">' + acc.name + '</span>' +
+                '<span class="acc-name">' + escapeHtml(acc.name) + '</span>' +
                 '<div class="account-item-controls">' +
-                    '<span class="acc-date-pill"' + (fmtDate(date) ? '' : ' style="display:none"') + '>' + fmtDate(date) + '</span>' +
+                    '<span class="acc-date-pill"' + (datePill ? '' : ' style="display:none"') + '>' + escapeHtml(datePill) + '</span>' +
                     '<span class="acc-balance-display">' + fmtMoney(balance) + '</span>' +
-                    '<button class="acc-edit-btn" onclick="window.openEntryModal(' + index + ')" title="Entries bewerken">&#9998;</button>' +
+                    '<button class="acc-edit-btn" onclick="window.openEntryModal(' + index + ')" title="Edit entries">&#9998;</button>' +
                     '<button class="delete-btn" onclick="window.openDeleteModal(' + index + ')">\u2715</button>' +
                 '</div>';
             container.appendChild(div);
@@ -115,22 +114,22 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // ─── Chart ────────────────────────────────────────────
 
-    var chartElem = document.getElementById('yearlySavingsChart');
-    var savingsChart;
+    const chartElem = document.getElementById('yearlySavingsChart');
+    let savingsChart;
 
     function buildChartData() {
-        var byDate = {};
+        const byDate = {};
         accounts.forEach(function (acc) {
             (acc.history || []).forEach(function (e) { byDate[e.date] = true; });
         });
-        var dates = Object.keys(byDate).sort();
+        const dates = Object.keys(byDate).sort();
         if (dates.length === 0) return { labels: [], data: [] };
 
-        var totals = dates.map(function (date) {
-            var sum = 0;
+        const totals = dates.map(function (date) {
+            let sum = 0;
             accounts.forEach(function (acc) {
-                var sorted = (acc.history || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
-                var last   = 0;
+                const sorted = (acc.history || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+                let last = 0;
                 sorted.forEach(function (e) { if (e.date <= date) last = parseFloat(e.balance) || 0; });
                 sum += last;
             });
@@ -142,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     function updateChart() {
         if (!chartElem) return;
-        var cd = buildChartData();
+        const cd = buildChartData();
         if (!savingsChart) {
             savingsChart = new Chart(chartElem.getContext('2d'), {
                 type: 'line',
@@ -164,26 +163,26 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
             });
         } else {
-            savingsChart.data.labels            = cd.labels;
-            savingsChart.data.datasets[0].data  = cd.data;
+            savingsChart.data.labels           = cd.labels;
+            savingsChart.data.datasets[0].data = cd.data;
             savingsChart.update();
         }
     }
 
-    // ─── Account toevoegen ────────────────────────────────
+    // ─── Add account ──────────────────────────────────────
 
     addBtn.onclick = function () { modalOverlay.style.display = 'flex'; modalInput.focus(); };
 
     document.getElementById('confirm-modal').onclick = async function () {
-        var name = modalInput.value.trim();
+        const name = modalInput.value.trim();
         if (!name) return;
 
-        var r = await sb.from('savings_accounts')
+        const { data, error } = await sb.from('savings_accounts')
             .insert({ name: name, user_id: user.id })
             .select('id, name').single();
-        if (r.error) { console.error(r.error); return; }
+        if (error) { console.error(error); return; }
 
-        accounts.push({ id: r.data.id, name: r.data.name, history: [] });
+        accounts.push({ id: data.id, name: data.name, history: [] });
         saveCache(accounts);
         updateUI();
         modalOverlay.style.display = 'none';
@@ -192,19 +191,19 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     document.getElementById('cancel-modal').onclick = function () { modalOverlay.style.display = 'none'; };
 
-    // ─── Entry modal (history bekijken / toevoegen) ───────
+    // ─── Entry modal (view/add history) ──────────────────
 
-    var entryModal      = document.getElementById('entry-modal-overlay');
-    var entryModalTitle = document.getElementById('entry-modal-title');
-    var entryDateInp    = document.getElementById('entry-date');
-    var entryAmtInp     = document.getElementById('entry-amount');
-    var entryList       = document.getElementById('entry-history-list');
-    var activeIndex     = null;
+    const entryModal      = document.getElementById('entry-modal-overlay');
+    const entryModalTitle = document.getElementById('entry-modal-title');
+    const entryDateInp    = document.getElementById('entry-date');
+    const entryAmtInp     = document.getElementById('entry-amount');
+    const entryList       = document.getElementById('entry-history-list');
+    let activeIndex = null;
 
     window.openEntryModal = function (index) {
         activeIndex = index;
         entryModalTitle.innerText = accounts[index].name;
-        var today = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
         entryDateInp.value = today;
         entryDateInp.max   = today;
         entryAmtInp.value  = '';
@@ -215,16 +214,16 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     function renderEntryHistory() {
         entryList.innerHTML = '';
-        var sorted = (accounts[activeIndex].history || []).slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
+        const sorted = (accounts[activeIndex].history || []).slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
         if (sorted.length === 0) {
-            entryList.innerHTML = '<p class="entry-empty">Nog geen entries. Voeg er een toe hierboven.</p>';
+            entryList.innerHTML = '<p class="entry-empty">No entries yet. Add one above.</p>';
             return;
         }
         sorted.forEach(function (e, i) {
-            var row = document.createElement('div');
+            const row = document.createElement('div');
             row.className = 'entry-row';
             row.innerHTML =
-                '<span class="entry-date">' + fmtDate(e.date) + '</span>' +
+                '<span class="entry-date">' + escapeHtml(fmtDate(e.date)) + '</span>' +
                 '<span class="entry-bal">' + fmtMoney(e.balance) + '</span>' +
                 '<button class="entry-delete-btn" onclick="window.deleteEntry(' + i + ')">\u2715</button>';
             entryList.appendChild(row);
@@ -232,25 +231,23 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     document.getElementById('confirm-entry').onclick = async function () {
-        var date    = entryDateInp.value;
-        var balance = parseFloat(entryAmtInp.value.replace(',', '.'));
+        const date    = entryDateInp.value;
+        const balance = parseFloat(entryAmtInp.value.replace(',', '.'));
         if (!date || isNaN(balance)) return;
 
-        var acc      = accounts[activeIndex];
-        var existing = acc.history.find(function (e) { return e.date === date; });
+        const acc      = accounts[activeIndex];
+        const existing = acc.history.find(function (e) { return e.date === date; });
 
         if (existing) {
-            // Bestaande entry updaten
-            var r = await sb.from('savings_entries').update({ balance: balance }).eq('id', existing.id);
-            if (r.error) { console.error(r.error); return; }
+            const { error } = await sb.from('savings_entries').update({ balance: balance }).eq('id', existing.id);
+            if (error) { console.error(error); return; }
             existing.balance = balance;
         } else {
-            // Nieuwe entry invoegen
-            var r = await sb.from('savings_entries')
+            const { data, error } = await sb.from('savings_entries')
                 .insert({ account_id: acc.id, user_id: user.id, date: date, balance: balance })
                 .select('id, date, balance').single();
-            if (r.error) { console.error(r.error); return; }
-            acc.history.push({ id: r.data.id, date: r.data.date, balance: parseFloat(r.data.balance) });
+            if (error) { console.error(error); return; }
+            acc.history.push({ id: data.id, date: data.date, balance: parseFloat(data.balance) });
             acc.history.sort(function (a, b) { return a.date.localeCompare(b.date); });
         }
 
@@ -261,11 +258,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
     window.deleteEntry = async function (sortedIndex) {
-        var sorted = (accounts[activeIndex].history || []).slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
-        var entry  = sorted[sortedIndex];
+        const sorted = (accounts[activeIndex].history || []).slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
+        const entry  = sorted[sortedIndex];
 
-        var r = await sb.from('savings_entries').delete().eq('id', entry.id);
-        if (r.error) { console.error(r.error); return; }
+        const { error } = await sb.from('savings_entries').delete().eq('id', entry.id);
+        if (error) { console.error(error); return; }
 
         accounts[activeIndex].history = accounts[activeIndex].history.filter(function (e) { return e.id !== entry.id; });
         saveCache(accounts);
@@ -275,25 +272,35 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     document.getElementById('close-entry-modal').onclick = function () { entryModal.style.display = 'none'; };
 
-    // ─── Account verwijderen ──────────────────────────────
+    // ─── Delete account ───────────────────────────────────
 
-    window.openDeleteModal = function (index) { window.indexToDelete = index; deleteModal.style.display = 'flex'; };
+    // Use a local variable instead of window.indexToDelete
+    let indexToDelete = null;
+
+    window.openDeleteModal = function (index) {
+        indexToDelete = index;
+        deleteModal.style.display = 'flex';
+    };
 
     document.getElementById('confirm-delete').onclick = async function () {
-        if (window.indexToDelete === undefined) return;
-        var acc = accounts[window.indexToDelete];
+        if (indexToDelete === null) return;
+        const acc   = accounts[indexToDelete];
+        const index = indexToDelete;
+        indexToDelete = null;
 
-        // CASCADE in DB verwijdert entries automatisch
-        var r = await sb.from('savings_accounts').delete().eq('id', acc.id);
-        if (r.error) { console.error(r.error); return; }
+        const { error } = await sb.from('savings_accounts').delete().eq('id', acc.id);
+        if (error) { console.error(error); return; }
 
-        accounts.splice(window.indexToDelete, 1);
+        accounts.splice(index, 1);
         saveCache(accounts);
         updateUI();
         deleteModal.style.display = 'none';
     };
 
-    document.getElementById('cancel-delete').onclick = function () { deleteModal.style.display = 'none'; };
+    document.getElementById('cancel-delete').onclick = function () {
+        indexToDelete = null;
+        deleteModal.style.display = 'none';
+    };
 
     // ─── Start ────────────────────────────────────────────
     await loadData();

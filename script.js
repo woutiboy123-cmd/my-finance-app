@@ -1,74 +1,72 @@
 document.addEventListener('DOMContentLoaded', async function () {
-    var savingsDisplay      = document.getElementById('dashboard-savings-amount');
-    var investmentDisplay   = document.getElementById('dashboard-investment-amount');
-    var totalBalanceDisplay = document.getElementById('total-combined-balance');
-    var portfolioCanvas     = document.getElementById('portfolioSpreadChart');
-    var netWorthCanvas      = document.getElementById('netWorthChart');
-    var transList           = document.getElementById('transactions-list');
+    const savingsDisplay      = document.getElementById('dashboard-savings-amount');
+    const investmentDisplay   = document.getElementById('dashboard-investment-amount');
+    const totalBalanceDisplay = document.getElementById('total-combined-balance');
+    const portfolioCanvas     = document.getElementById('portfolioSpreadChart');
+    const netWorthCanvas      = document.getElementById('netWorthChart');
+    const transList           = document.getElementById('transactions-list');
 
-
-    // ─── Dashboard cache instant tonen ───────────────────
-    var localUid = getLocalUserId();
+    // ─── Show dashboard cache immediately ────────────────
+    const localUid = getLocalUserId();
     if (localUid) {
         try {
-            var _dc = JSON.parse(localStorage.getItem('cache_dashboard_' + localUid));
-            if (_dc) {
-                var _fmt = function(n) { return '\u20ac ' + (parseFloat(n)||0).toLocaleString('nl-NL',{minimumFractionDigits:2,maximumFractionDigits:2}); };
-                var _sd = document.getElementById('dashboard-savings-amount');
-                var _id = document.getElementById('dashboard-investment-amount');
-                var _td = document.getElementById('total-combined-balance');
-                if (_sd) _sd.innerText = _fmt(_dc.totalSavings || 0);
-                if (_id) _id.innerText = _fmt(_dc.totalInvestments || 0);
-                if (_td) _td.innerText = _fmt(_dc.combinedTotal || 0);
+            const dc = JSON.parse(localStorage.getItem('cache_dashboard_' + localUid));
+            if (dc) {
+                const fmt = function (n) { return '\u20ac ' + (parseFloat(n) || 0).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+                if (savingsDisplay)      savingsDisplay.innerText      = fmt(dc.totalSavings     || 0);
+                if (investmentDisplay)   investmentDisplay.innerText   = fmt(dc.totalInvestments || 0);
+                if (totalBalanceDisplay) totalBalanceDisplay.innerText = fmt(dc.combinedTotal    || 0);
             }
-        } catch(e) {}
+        } catch (e) {}
     }
 
-    var sb   = getSupabase();
-    var user = await requireAuth();
+    const sb   = getSupabase();
+    const user = await requireAuth();
     if (!user) return;
 
-
-    var CACHE_KEY = 'cache_dashboard_' + user.id;
+    const CACHE_KEY = 'cache_dashboard_' + user.id;
 
     function saveCache(data) {
-        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch(e) {}
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) {}
     }
 
-    var fmt = function (n) {
+    const fmt = function (n) {
         return '\u20ac ' + (parseFloat(n) || 0).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
 
     function fmtDate(iso) {
         if (!iso) return '';
-        var p = iso.split('-');
+        const p = iso.split('-');
         return p[2] + '-' + p[1] + '-' + p[0];
     }
 
     function getLatestBalance(acc) {
         if (!acc.history || acc.history.length === 0) return 0;
-        var sorted = acc.history.slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+        const sorted = acc.history.slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
         return parseFloat(sorted[sorted.length - 1].balance) || 0;
     }
 
-    // ─── Laad alle data parallel ──────────────────────────
+    // ─── Load all data in parallel ────────────────────────
 
-    var results = await Promise.all([
+    const results = await Promise.all([
         sb.from('savings_accounts').select('id, name').order('created_at'),
         sb.from('savings_entries').select('account_id, date, balance').order('date'),
         sb.from('investment_accounts').select('id, name').order('created_at'),
         sb.from('investment_entries').select('account_id, date, balance').order('date'),
-        sb.from('transactions').select('id, category, amount, date, note').order('date', { ascending: false }).order('created_at', { ascending: false }).limit(10)
+        sb.from('transactions').select('id, category, amount, date, note')
+            .order('date', { ascending: false })
+            .order('created_at', { ascending: false })
+            .limit(10)
     ]);
 
-    var savAccs  = results[0].data || [];
-    var savEnts  = results[1].data || [];
-    var invAccs  = results[2].data || [];
-    var invEnts  = results[3].data || [];
-    var txns     = results[4].data || [];
+    const savAccs = results[0].data || [];
+    const savEnts = results[1].data || [];
+    const invAccs = results[2].data || [];
+    const invEnts = results[3].data || [];
+    const txns    = results[4].data || [];
 
-    // Bouw account-objecten met history
-    var savingsData = savAccs.map(function (acc) {
+    // Build account objects with history
+    const savingsData = savAccs.map(function (acc) {
         return {
             id: acc.id, name: acc.name,
             history: savEnts.filter(function (e) { return e.account_id === acc.id; })
@@ -76,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         };
     });
 
-    var investmentData = invAccs.map(function (acc) {
+    const investmentData = invAccs.map(function (acc) {
         return {
             id: acc.id, name: acc.name,
             history: invEnts.filter(function (e) { return e.account_id === acc.id; })
@@ -84,38 +82,38 @@ document.addEventListener('DOMContentLoaded', async function () {
         };
     });
 
-    // ─── Totalen ──────────────────────────────────────────
+    // ─── Totals ───────────────────────────────────────────
 
-    var totalSavings     = savingsData.reduce(function (s, a) { return s + getLatestBalance(a); }, 0);
-    var totalInvestments = investmentData.reduce(function (s, a) { return s + getLatestBalance(a); }, 0);
-    var combinedTotal    = totalSavings + totalInvestments;
+    const totalSavings     = savingsData.reduce(function (s, a) { return s + getLatestBalance(a); }, 0);
+    const totalInvestments = investmentData.reduce(function (s, a) { return s + getLatestBalance(a); }, 0);
+    const combinedTotal    = totalSavings + totalInvestments;
 
     if (savingsDisplay)      savingsDisplay.innerText      = fmt(totalSavings);
     if (investmentDisplay)   investmentDisplay.innerText   = fmt(totalInvestments);
     if (totalBalanceDisplay) totalBalanceDisplay.innerText = fmt(combinedTotal);
-    saveCache({ totalSavings: totalSavings, totalInvestments: totalInvestments, combinedTotal: combinedTotal });
+    saveCache({ totalSavings, totalInvestments, combinedTotal });
 
-    // ─── Recente transacties ──────────────────────────────
+    // ─── Recent transactions ──────────────────────────────
 
     if (transList) {
         if (txns.length === 0) {
-            transList.innerHTML = '<p class="empty-state">Nog geen transacties.</p>';
+            transList.innerHTML = '<p class="empty-state">No transactions yet.</p>';
         } else {
             txns.forEach(function (t, index) {
-                var amount = parseFloat(t.amount) || 0;
-                var isNeg  = amount < 0;
-                var div    = document.createElement('div');
+                const amount = parseFloat(t.amount) || 0;
+                const isNeg  = amount < 0;
+                const div    = document.createElement('div');
                 div.className = 'account-item';
                 div.innerHTML =
-                    '<span class="category-display">' + t.category + '</span>' +
-                    '<span class="date-display">' + fmtDate(t.date) + '</span>' +
+                    '<span class="category-display">' + escapeHtml(t.category) + '</span>' +
+                    '<span class="date-display">' + escapeHtml(fmtDate(t.date)) + '</span>' +
                     '<span class="trans-right-side ' + (isNeg ? 'amount-negative' : 'amount-positive') + '">' +
                         (isNeg ? '-' : '+') + ' \u20ac ' +
                         Math.abs(amount).toLocaleString('nl-NL', { minimumFractionDigits: 2 }) +
                     '</span>';
                 transList.appendChild(div);
                 if (index < txns.length - 1) {
-                    var hr = document.createElement('div');
+                    const hr = document.createElement('div');
                     hr.className = 'subtle-divider';
                     transList.appendChild(hr);
                 }
@@ -126,10 +124,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     // ─── Portfolio Spread (Doughnut) ──────────────────────
 
     if (portfolioCanvas) {
-        var allAccounts  = savingsData.concat(investmentData);
-        var labels       = allAccounts.map(function (a) { return a.name; });
-        var dataValues   = allAccounts.map(function (a) { return getLatestBalance(a); });
-        var colorPalette = ['#4facfe','#4ade80','#facc15','#f87171','#a78bfa','#fb923c','#2dd4bf','#e879f9','#94a3b8','#fb7185'];
+        const allAccounts  = savingsData.concat(investmentData);
+        const labels       = allAccounts.map(function (a) { return a.name; });
+        const dataValues   = allAccounts.map(function (a) { return getLatestBalance(a); });
+        const colorPalette = ['#4facfe','#4ade80','#facc15','#f87171','#a78bfa','#fb923c','#2dd4bf','#e879f9','#94a3b8','#fb7185'];
 
         new Chart(portfolioCanvas.getContext('2d'), {
             type: 'doughnut',
@@ -146,11 +144,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                         labels: {
                             color: '#c0c0c8', padding: 20, font: { size: 13 }, usePointStyle: true, pointStyle: 'circle',
                             generateLabels: function (chart) {
-                                var data  = chart.data;
-                                var total = data.datasets[0].data.reduce(function (a, b) { return a + b; }, 0);
+                                const data  = chart.data;
+                                const total = data.datasets[0].data.reduce(function (a, b) { return a + b; }, 0);
                                 return data.labels.map(function (label, i) {
-                                    var value = data.datasets[0].data[i] || 0;
-                                    var pct   = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    const value = data.datasets[0].data[i] || 0;
+                                    const pct   = total > 0 ? Math.round((value / total) * 100) : 0;
                                     return { text: label + '  ' + pct + '%', fillStyle: colorPalette[i], strokeStyle: colorPalette[i], fontColor: '#c0c0c8', pointStyle: 'circle', hidden: false, index: i };
                                 });
                             }
@@ -159,9 +157,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                     tooltip: {
                         callbacks: {
                             label: function (ctx) {
-                                var val   = ctx.raw || 0;
-                                var total = ctx.dataset.data.reduce(function (a, b) { return a + b; }, 0);
-                                var pct   = total > 0 ? Math.round((val / total) * 100) : 0;
+                                const val   = ctx.raw || 0;
+                                const total = ctx.dataset.data.reduce(function (a, b) { return a + b; }, 0);
+                                const pct   = total > 0 ? Math.round((val / total) * 100) : 0;
                                 return ' ' + ctx.label + ': \u20ac' + val.toLocaleString('nl-NL') + ' (' + pct + '%)';
                             }
                         }
@@ -175,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // ─── Net Worth Growth (Line) ──────────────────────────
 
     if (netWorthCanvas) {
-        var allDateMap = {};
+        const allDateMap = {};
         savingsData.concat(investmentData).forEach(function (acc) {
             (acc.history || []).forEach(function (e) { allDateMap[e.date] = true; });
         });
@@ -184,20 +182,20 @@ document.addEventListener('DOMContentLoaded', async function () {
             allDateMap[new Date().toISOString().split('T')[0]] = true;
         }
 
-        var sortedDates = Object.keys(allDateMap).sort();
+        const sortedDates = Object.keys(allDateMap).sort();
 
-        var netWorthPoints = sortedDates.map(function (date) {
-            var sum = 0;
+        const netWorthPoints = sortedDates.map(function (date) {
+            let sum = 0;
             savingsData.concat(investmentData).forEach(function (acc) {
-                var hist = (acc.history || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
-                var last = 0;
+                const hist = (acc.history || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+                let last = 0;
                 hist.forEach(function (e) { if (e.date <= date) last = parseFloat(e.balance) || 0; });
                 sum += last;
             });
             return sum;
         });
 
-        var netLabels = sortedDates.map(fmtDate);
+        const netLabels = sortedDates.map(fmtDate);
 
         new Chart(netWorthCanvas.getContext('2d'), {
             type: 'line',

@@ -1,35 +1,31 @@
-var SUPABASE_URL = 'https://pxqbopifausvwlkvomgn.supabase.co';
-var SUPABASE_KEY = 'sb_publishable_QEU1LxylnAea2td7Ond5Cg_XoBBrUWm';
+// Uses getSupabase() from supabase-client.js (loaded before this script in login.html)
 
-var supabaseClient;
+document.addEventListener('DOMContentLoaded', function () {
+    const authBtn       = document.getElementById('auth-btn');
+    const emailInput    = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const authTitle     = document.getElementById('auth-title');
 
-document.addEventListener('DOMContentLoaded', function() {
-    if (!window.supabase) { console.error('Supabase library not loaded.'); return; }
-
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    var authBtn       = document.getElementById('auth-btn');
-    var emailInput    = document.getElementById('email');
-    var passwordInput = document.getElementById('password');
-    var authTitle     = document.getElementById('auth-title');
-
-    authBtn.addEventListener('click', async function(e) {
+    authBtn.addEventListener('click', async function (e) {
         e.preventDefault();
-        var email      = emailInput.value.trim();
-        var password   = passwordInput.value.trim();
-        var isRegister = authTitle.innerText === 'Create Account';
+        const email      = emailInput.value.trim();
+        const password   = passwordInput.value.trim();
+        const isRegister = authTitle.innerText === 'Create Account';
 
         if (!email || !password) { alert('Please fill in an email address and password.'); return; }
 
+        const sb = getSupabase();
+        if (!sb) { alert('Could not connect to the server. Please refresh.'); return; }
+
         try {
             if (isRegister) {
-                var reg = await supabaseClient.auth.signUp({ email: email, password: password });
-                if (reg.error) throw reg.error;
+                const { error } = await sb.auth.signUp({ email, password });
+                if (error) throw error;
                 window.location.href = 'dashboard.html';
             } else {
-                var login = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
-                if (login.error) throw login.error;
-                if (login.data.user) window.location.href = 'dashboard.html';
+                const { data, error } = await sb.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                if (data.user) window.location.href = 'dashboard.html';
             }
         } catch (err) {
             alert('Error: ' + err.message);
