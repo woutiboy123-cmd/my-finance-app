@@ -172,10 +172,6 @@ body {
     overflow: visible;
 }
 
-.chart-container canvas {
-    overflow: visible;
-}
-
 /* ─── Transaction List (dashboard) ────────── */
 
 #transactions-list { margin-top: 20px; }
