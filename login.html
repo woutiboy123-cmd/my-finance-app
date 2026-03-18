@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyFinance - Inloggen</title>
+    <title>MyFinance - Login</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+    <script defer src="/_vercel/insights/script.js"></script>
     <style>
         :root {
             --bg-color: #000000;
             --card-bg: #1c1c1e;
-            --accent-green: #34c759;
+            --accent-green: #1a7a32;
             --text-main: #ffffff;
             --text-dim: #8e8e93;
             --input-bg: #2c2c2e;
@@ -20,10 +22,15 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
+            height: 100vh;
+        }
+
+        main {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 100%;
+            width: 100%;
         }
 
         .login-box {
@@ -41,7 +48,7 @@
 
         .input-group { text-align: left; margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; color: var(--text-dim); font-size: 13px; font-weight: 500; }
-        
+
         input {
             width: 100%;
             padding: 14px;
@@ -73,15 +80,15 @@
 
         .btn-submit:hover { opacity: 0.9; }
 
-        /* The blue clickable text you asked for */
         .toggle-container {
             margin-top: 24px;
             font-size: 14px;
             color: var(--text-dim);
         }
 
+        /* Darker blue for WCAG AA contrast on dark background */
         .toggle-link {
-            color: #007aff; /* iOS Blue */
+            color: #4d9fff;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
@@ -90,66 +97,63 @@
 
         .toggle-link:hover { text-decoration: underline; }
     </style>
-    <script defer src="/_vercel/speed-insights/script.js"></script>
-    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
+    <!-- <main> fixes "Document should have one main landmark" -->
+    <main>
+        <div class="login-box">
+            <h2 id="auth-title">Sign In</h2>
+            <p class="subtitle" id="auth-desc">Enter your details to access your profiles.</p>
 
-    <div class="login-box">
-        <h2 id="auth-title">Sign In</h2>
-        <p class="subtitle" id="auth-desc">Enter your details to access your profiles.</p>
-        
-        <div class="input-group">
-            <label>Email Address</label>
-            <input type="email" id="email" placeholder="name@example.com">
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="name@example.com" autocomplete="email">
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+            </div>
+
+            <button class="btn-submit" id="auth-btn">Continue</button>
+
+            <div class="toggle-container">
+                <span id="toggle-text-prefix">Don't have an account?</span>
+                <span class="toggle-link" id="toggle-link" onclick="toggleMode()" role="button" tabindex="0">Create one</span>
+            </div>
         </div>
-        
-        <div class="input-group">
-            <label>Password</label>
-            <input type="password" id="password" placeholder="••••••••">
-        </div>
-        
-        <button class="btn-submit" id="auth-btn">Continue</button>
-        
-        <div class="toggle-container">
-            <span id="toggle-text-prefix">Don't have an account?</span>
-            <span class="toggle-link" id="toggle-link" onclick="toggleMode()">Create one</span>
-        </div>
-    </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="supabase-client.js" defer></script>
     <script src="auth.js" defer></script>
     <script>
         function toggleMode() {
-            const title = document.getElementById('auth-title');
-            const desc = document.getElementById('auth-desc');
-            const btn = document.getElementById('auth-btn');
+            const title  = document.getElementById('auth-title');
+            const desc   = document.getElementById('auth-desc');
+            const btn    = document.getElementById('auth-btn');
             const prefix = document.getElementById('toggle-text-prefix');
-            const link = document.getElementById('toggle-link');
-            
+            const link   = document.getElementById('toggle-link');
+
             if (title.innerText === 'Sign In') {
-                title.innerText = 'Create Account';
-                desc.innerText = 'Join to start tracking.';
-                btn.innerText = 'Sign Up';
+                title.innerText  = 'Create Account';
+                desc.innerText   = 'Join to start tracking.';
+                btn.innerText    = 'Sign Up';
                 prefix.innerText = 'Already have an account?';
-                link.innerText = 'Sign In';
+                link.innerText   = 'Sign In';
             } else {
-                title.innerText = 'Sign In';
-                desc.innerText = 'Enter your details to access your profiles.';
-                btn.innerText = 'Continue';
+                title.innerText  = 'Sign In';
+                desc.innerText   = 'Enter your details to access your profiles.';
+                btn.innerText    = 'Continue';
                 prefix.innerText = "Don't have an account?";
-                link.innerText = 'Create one';
+                link.innerText   = 'Create one';
             }
         }
 
-        // Logic to check if user clicked "Create Account" from the welcome page
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('mode') === 'signup') {
-                toggleMode();
-            }
-        }
+            if (urlParams.get('mode') === 'signup') toggleMode();
+        };
     </script>
 </body>
 </html>

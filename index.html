@@ -6,6 +6,8 @@
     <title>MyFinance</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
     <link rel="stylesheet" href="style.css">
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+    <script defer src="/_vercel/insights/script.js"></script>
     <style>
         .welcome-container {
             height: 100vh;
@@ -44,8 +46,8 @@
             transition: transform 0.2s;
         }
         .btn-login {
-            background-color: #34c759;
-            color: white;
+            background-color: #1a7a32;
+            color: #ffffff;
         }
         .btn-register {
             background-color: #2c2c2e;
@@ -59,17 +61,17 @@
     </style>
 </head>
 <body>
-    <div class="welcome-container">
+    <main class="welcome-container">
         <div class="welcome-card">
-            <div class="welcome-logo">💰</div>
+            <div class="welcome-logo" role="img" aria-label="Money bag">💰</div>
             <h1>Personal Finance</h1>
-            <p>Keep track of all your spendings/ Savings and Investments!</p>
-            
+            <p>Keep track of all your spendings, Savings and Investments!</p>
+
             <div class="auth-buttons">
                 <button class="btn-auth btn-login" onclick="location.href='login.html'">Login</button>
                 <button class="btn-auth btn-register" onclick="location.href='login.html?mode=signup'">Create Account</button>
             </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>
