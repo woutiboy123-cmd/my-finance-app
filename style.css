@@ -169,6 +169,11 @@ body {
     position: relative;
     height: 260px;
     margin-top: 20px;
+    overflow: visible;
+}
+
+.chart-container canvas {
+    overflow: visible;
 }
 
 /* ─── Transaction List (dashboard) ────────── */

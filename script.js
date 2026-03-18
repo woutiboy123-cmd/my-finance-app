@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                layout: { padding: { right: 10, bottom: 16 } },
+                layout: { padding: { right: 10, top: 24, bottom: 24, left: 10 } },
                 plugins: {
                     legend: {
                         position: 'right',
