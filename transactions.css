@@ -346,6 +346,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
 
     .note-display { display: none; }
 
+    /* Reset the desktop padding hack so the amount is visible on mobile */
+    .note-amount-wrapper {
+        padding-left: 0;
+        justify-content: flex-end;
+    }
+
     .trans-right-side { font-size: 13px; }
 
     .category-display { font-size: 13px; }
