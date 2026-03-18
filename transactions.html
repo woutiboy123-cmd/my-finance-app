@@ -12,12 +12,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-client.js"></script>
     <script src="transactions.js" defer></script>
-    <script defer src="/_vercel/speed-insights/script.js"></script>
-    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
-    <div class="dashboard-container" role="none">
-        <aside class="sidebar">
+    <div class="dashboard-container">
+        <aside class="sidebar" aria-label="Navigation">
             <a href="dashboard.html" class="sidebar-title">Personal Finance</a>
             <nav>
                 <ul class="nav-list">
@@ -29,7 +27,7 @@
             </nav>
         </aside>
 
-        <main class="main-content">
+        <main class="main-content" aria-label="Main content">
             <header>
                 <h1 class="welcome-text">Transaction History</h1>
             </header>

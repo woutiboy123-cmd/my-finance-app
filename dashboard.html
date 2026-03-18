@@ -55,8 +55,8 @@
     <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
-    <div class="dashboard-container" role="none">
-        <aside class="sidebar">
+    <div class="dashboard-container">
+        <aside class="sidebar" aria-label="Navigation">
             <a href="dashboard.html" class="sidebar-title">Personal Finance</a>
             <nav>
                 <ul class="nav-list">
@@ -68,7 +68,7 @@
             </nav>
         </aside>
 
-        <main class="main-content">
+        <main class="main-content" aria-label="Main content">
             <header class="page-header">
                 <h1 class="welcome-text" style="margin-bottom: 0;">Welcome back</h1>
                 <button onclick="handleLogout()" class="btn-logout">Sign Out</button>
