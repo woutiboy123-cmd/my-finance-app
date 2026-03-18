@@ -117,6 +117,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="auth.js" defer></script>
     <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script>
         function toggleMode() {
             const title = document.getElementById('auth-title');
             const desc = document.getElementById('auth-desc');
